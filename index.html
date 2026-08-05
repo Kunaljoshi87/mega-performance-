@@ -99,8 +99,8 @@
 
 <div class="titleblock">
   <div class="tb-grid">
-    <div><label>Employee Name</label><input id="empName" placeholder="e.g. Kunal Joshi " ></div>
-    <div><label>Appraiser Name</label><input id="appraiserName" placeholder="e.g. Kunal Joshi"></div>
+    <div><label>Employee Name</label><input id="empName" placeholder="e.g. Rohan Ravindra Mahamane"></div>
+    <div><label>Appraiser Name</label><input id="appraiserName" placeholder="e.g. Mithil Sarjerao Mane"></div>
     <div><label>Department</label><input id="deptName" placeholder="e.g. Software Development (Zoho)"></div>
     <div><label>Year</label><input id="yearInput" value="2026"></div>
   </div>
@@ -512,7 +512,7 @@ async function saveAll(){
       if(!kra.name) continue;
       const kraRecord = await creatorAddRecord("KRA", {
         KRA_Name: kra.name, Description: kra.description||'', Employee_Name: employee,
-        Quarter: quarter, Year: year, Weightage: kra.weightage
+        Quarter: quarter, Year_field1: year, Weightage: kra.weightage
       });
       const kraId = kraRecord.ID;
       for(const goal of kra.goals){
@@ -520,7 +520,7 @@ async function saveAll(){
         await creatorAddRecord("Goal", {
           Goal_Name: goal.name, Description: goal.name, KRA: kraId, Weightage: goal.weightage||'',
           Achievement: goal.achievement||'', Self_Rating: goal.selfRating||'', Appraiser_Rating: goal.apprRating||'',
-          Goal_Type: "Manual", Data_Source: "Manual"
+          Data_Source: "Manual"
         });
       }
     }
@@ -528,13 +528,13 @@ async function saveAll(){
       if(!attr.name) continue;
       await creatorAddRecord("Competency", {
         Attribute_Name: attr.name, Weightage: attr.weightage, Rating: attr.rating||'',
-        Employee_Name: employee, Quarter: quarter, Year: year
+        Employee_Name1: employee, Quarter: quarter, Year_field1: year
       });
     }
     const scores = computeScores();
     await creatorAddRecord("Review", {
-      Employee_Name: employee, Appraiser_Name: appraiser, Department: department, Quarter: quarter, Year: year,
-      Facilitating_Factors: document.getElementById('facFactors').value,
+      Employee_Name: employee, Appraiser_Name: appraiser, Department: department, Quarter: quarter, Year_field: year,
+      Facilitating_Factors1: document.getElementById('facFactors').value,
       Constraining_Factors: document.getElementById('conFactors').value,
       Outstanding_Achievement: document.getElementById('outAchieve').value,
       Appraiser_Comments: document.getElementById('apprComments').value,
@@ -548,7 +548,7 @@ async function saveAll(){
       if(!t.need) continue;
       await creatorAddRecord("Training_Need", {
         Training_Need: t.need, Expected_Benefit: t.benefit||'', How_Fulfilled: t.fulfilled||'',
-        Employee_Name: employee, Quarter: quarter, Year: year
+        Employee_Name: employee, Quarter1: quarter, Year_field: year
       });
     }
     setStatus('✅ Saved successfully to Zoho Creator.', true);
