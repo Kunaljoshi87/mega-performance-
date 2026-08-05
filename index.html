@@ -477,7 +477,7 @@ function setStatus(msg, ok){
 function creatorAddRecord(formName, data){
   return new Promise((resolve, reject) => {
     ZOHO.CREATOR.DATA.addRecord({
-      appName: "assest-management",   // TODO: confirm exact app link name
+      appName: "creatorapp.zoho.in/megaengg/asset-management",   // TODO: confirm exact app link name
       formName: formName,
       payload: { data: data }
     }).then(resp => {
