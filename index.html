@@ -314,13 +314,13 @@ function onEmployeeChange(){
 /* ============================================================
    CURRENT USER + PENDING APPROVALS
    ============================================================ */
-function getCurrentUser(){
-  return new Promise((resolve) => {
-    if(!window.ZOHO || !ZOHO.CREATOR || !ZOHO.CREATOR.UTIL){ resolve(''); return; }
-    ZOHO.CREATOR.UTIL.getInitParams().then(resp => {
-      resolve((resp && resp.loginUser) ? resp.loginUser : '');
-    }).catch(() => resolve(''));
-  });
+function getCurrentUser() {
+    try {
+        const resp = ZOHO.CREATOR.UTIL.getInitParams();
+        return Promise.resolve(resp.loginUser || "");
+    } catch (e) {
+        return Promise.resolve("");
+    }
 }
 function fetchPendingApprovals(){
   if(!state.currentUserEmail){ return Promise.resolve(); }
@@ -812,10 +812,21 @@ async function saveAll(){
       });
     }
     const scores = computeScores();
-    await creatorAddRecord("Review", {
+
+console.log("Scores :", scores);
+console.log("KRA :", scores.kraContribution);
+console.log("Competency :", scores.attrContribution);
+console.log("Final :", scores.overall);
+console.log("Type :", typeof scores.overall);
+
+await creatorAddRecord("Review", {
+                           
+                           
+                           
+                           {
       Employee_Lookup: empId,
       Department_Head: deptHeadId || '',
-      HR_Approver: hrApproverId || '',
+    //  HR_Approver: hrApproverId || '',
       Status: statusVal,
       Appraiser_Name: appraiser, Department: department, Quarter: quarter, Year_field: year,
       Facilitating_Factors1: document.getElementById('facFactors').value,
@@ -826,8 +837,7 @@ async function saveAll(){
       Overall_Rating: state.overallRating || '',
       KRA_Score: parseFloat(scores.kraContribution.toFixed(2)) || 0,
       Competency_Score: parseFloat(scores.attrContribution.toFixed(2)) || 0,
-      Final_Score: parseFloat(scores.overall.toFixed(2)) || 0
-    });
+Final_Score: Number(scores.overall)    });
     for(const t of state.training){
       if(!t.need) continue;
       await creatorAddRecord("Training_Need", {
