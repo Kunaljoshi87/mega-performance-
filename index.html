@@ -23,7 +23,7 @@
     font-family:'Inter',sans-serif; font-size:13px; padding:8px 10px; width:100%; outline:none;
   }
   input:focus,textarea:focus,select:focus{border-color:var(--navy);}
-  input:disabled{background:#EEF1F4; color:var(--muted); cursor:not-allowed;}
+  input:disabled,select:disabled{background:#EEF1F4; color:var(--muted); cursor:not-allowed;}
   textarea{resize:vertical; min-height:60px;}
   label{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); display:block; margin-bottom:4px;}
   button{
@@ -35,6 +35,8 @@
   button.danger:hover{background:var(--red); color:#FFFFFF;}
   button.solid{background:var(--navy); color:#FFFFFF;}
   button.small{padding:5px 10px; font-size:10px;}
+  button:disabled{opacity:.4; cursor:not-allowed;}
+  button:disabled:hover{background:transparent; color:var(--navy);}
 
   .titleblock{
     border:1px solid var(--line); background:var(--panel); padding:20px 24px; margin-bottom:20px;
@@ -93,16 +95,57 @@
   @media(max-width:700px){
     .two-col, .kra-top .fields, .achievement-grid, .attr-row{grid-template-columns:1fr;}
   }
+
+  /* ===== TABS ===== */
+  .tab-row{display:flex; gap:8px; margin-bottom:20px;}
+  .tab-btn{padding:10px 18px; border:1px solid var(--line); background:var(--panel); color:var(--muted); cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px; position:relative;}
+  .tab-btn.active{border-color:var(--navy); color:var(--navy); font-weight:600; background:#EAF1FA;}
+  .tab-badge{background:var(--red); color:#fff; font-size:10px; padding:1px 6px; border-radius:10px; margin-left:6px;}
+
+  /* ===== APPROVALS ===== */
+  .approval-card{border:1px solid var(--line); background:var(--panel); padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;}
+  .approval-card .meta{font-size:12px; color:var(--muted);}
+  .approval-card .role-tag{font-family:'IBM Plex Mono',monospace; font-size:10px; padding:2px 8px; border:1px solid var(--amber); color:var(--amber);}
+  .approval-detail-block{border:1px dashed var(--line); padding:14px; margin-bottom:12px;}
+  .approval-goal-row{display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; align-items:end; margin-top:10px; padding-top:10px; border-top:1px solid var(--line);}
+  .readonly-box{background:#EEF1F4; padding:8px 10px; font-size:13px; border:1px solid var(--line); min-height:20px;}
 </style>
 </head>
 <body>
 
+<div class="tab-row" id="tabRow" style="display:none;">
+  <div class="tab-btn active" id="tabAppraisal" onclick="switchTab('appraisal')">My Appraisal</div>
+  <div class="tab-btn" id="tabApprovals" onclick="switchTab('approvals')">Approvals <span class="tab-badge" id="approvalBadge" style="display:none;">0</span></div>
+</div>
+
+<div id="appraisalView">
+
 <div class="titleblock">
   <div class="tb-grid">
-    <div><label>Employee Name</label><input id="empName" placeholder=" pls Typ Name"></div>
+    <div>
+      <label>Employee</label>
+      <select id="empSelect" onchange="onEmployeeChange()"><option value="">Loading employees…</option></select>
+    </div>
     <div><label>Appraiser Name</label><input id="appraiserName" placeholder="e.g. Kunal Joshi"></div>
-    <div><label>Department</label><input id="deptName" placeholder="e.g. Software Development (Zoho)"></div>
+    <div><label>Department</label><div class="readonly-box" id="deptDisplay">—</div></div>
     <div><label>Year</label><input id="yearInput" value="2026"></div>
+  </div>
+  <div class="tb-grid" style="margin-top:16px;">
+    <div>
+      <label>Department Head (Approver)</label>
+      <select id="deptHeadSelect"><option value="">Loading employees…</option></select>
+    </div>
+    <div>
+      <label>HR Approver (Final)</label>
+      <select id="hrApproverSelect"><option value="">Loading employees…</option></select>
+    </div>
+    <div>
+      <label>Status</label>
+      <select id="statusSelect">
+        <option value="Draft">Draft (save only, don't submit)</option>
+        <option value="Submitted for Approval">Submitted for Approval</option>
+      </select>
+    </div>
   </div>
   <div class="quarter-row" id="quarterRow"></div>
 </div>
@@ -128,9 +171,8 @@
     </div>
   </div>
   <div class="settings-note">
-    KRA and Role Attribute weightage below are auto-distributed equally from these totals — add/remove a KRA or attribute, or change the totals here, and every weight rebalances automatically. No manual weight entry needed at that level.
+    KRA and Role Attribute weightage below are auto-distributed equally from these totals — add/remove a KRA or attribute, or change the totals here, and every weight rebalances automatically.
   </div>
-
   <div style="margin-top:18px;">
     <label style="margin-bottom:8px;">Rating → Percentage Mapping (editable)</label>
     <div id="ratingMapGrid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px;"></div>
@@ -185,29 +227,44 @@
   <div class="overall-options" id="overallOptions"></div>
 </div>
 
+</div><!-- /appraisalView -->
+
+<!-- ============ APPROVALS VIEW ============ -->
+<div id="approvalsView" style="display:none;">
+  <div class="section">
+    <div class="section-head"><h2>Pending Approvals</h2></div>
+    <div id="approvalsList"><div style="color:var(--muted); font-size:13px;">No pending approvals.</div></div>
+  </div>
+  <div id="approvalDetailContainer"></div>
+</div>
+
 <div class="footer-bar">
   <span class="status" id="statusText">Not saved yet.</span>
   <div style="display:flex; gap:10px;">
     <button onclick="exportJSON()">Export as JSON</button>
-    <button class="solid" onclick="saveAll()">Save Appraisal</button>
+    <button class="solid" id="saveBtn" onclick="saveAll()">Save Appraisal</button>
   </div>
 </div>
 
 <script>
 /* ============================================================
+   CONSTANTS
+   ============================================================ */
+const APP_NAME = "assest-management";
+const REPORTS = { employees:"All_Employees", kra:"KRA_Report", goal:"Goal_Report", competency:"Competency_Report", review:"Review_Report" };
+const FORMS = { kra:"KRA", goal:"Goal", competency:"Competency", review:"Review", training:"Training_Need" };
+
+/* ============================================================
    STATE
    ============================================================ */
 const state = {
   quarter: 'Q1',
-  settings: {
-    kraSectionWeight: 80,
-    roleSectionWeight: 20,
-    ratingMap: {5:100, 4:90, 3:75, 2:50, 1:25}
-  },
-  kras: [],        // {id,name,description,weightage(auto),goals:[{id,name,weightage,achievement,selfRating,apprRating}]}
-  attributes: [],  // {id,name,weightage(auto),rating}
-  training: [],
-  overallRating: null
+  settings: { kraSectionWeight: 80, roleSectionWeight: 20, ratingMap: {5:100, 4:90, 3:75, 2:50, 1:25} },
+  kras: [], attributes: [], training: [], overallRating: null,
+  employees: [],           // {ID, name, department, email}
+  currentUserEmail: '',
+  pendingApprovals: [],    // {review, role: 'head'|'hr'}
+  activeApproval: null     // { review, role, kras:[{kra,goals:[]}], competencies:[] }
 };
 let kraSeq=1, goalSeq=1, attrSeq=1, trainSeq=1;
 
@@ -222,14 +279,227 @@ function renderQuarters(){
 function setQuarter(q){ state.quarter=q; renderQuarters(); markUnsaved(); }
 
 /* ============================================================
+   EMPLOYEE DROPDOWNS
+   ============================================================ */
+function empDisplayName(rec){
+  const v = rec.Employee_Name;
+  if(!v) return rec.ID;
+  if(typeof v === 'string') return v;
+  if(typeof v === 'object') return [v.prefix,v.first_name,v.last_name,v.suffix].filter(Boolean).join(' ').trim() || rec.ID;
+  return String(v);
+}
+function fetchEmployees(){
+  return new Promise((resolve) => {
+    const config = { appName: APP_NAME, reportName: REPORTS.employees, page:1, pageSize:200 };
+    ZOHO.CREATOR.API.getAllRecords(config).then(resp => {
+      const data = (resp && resp.data) ? resp.data : [];
+      state.employees = data.map(r => ({ ID: r.ID, name: empDisplayName(r), department: r.Department || '', email: r.Email || '' }));
+      resolve();
+    }).catch(err => { console.error('fetchEmployees error', err); state.employees=[]; resolve(); });
+  });
+}
+function populateEmployeeDropdowns(){
+  const opts = '<option value="">— Select —</option>' + state.employees.map(e => `<option value="${e.ID}">${escapeAttr(e.name)}</option>`).join('');
+  document.getElementById('empSelect').innerHTML = opts;
+  document.getElementById('deptHeadSelect').innerHTML = opts;
+  document.getElementById('hrApproverSelect').innerHTML = opts;
+}
+function onEmployeeChange(){
+  const id = document.getElementById('empSelect').value;
+  const emp = state.employees.find(e => e.ID === id);
+  document.getElementById('deptDisplay').textContent = emp ? (emp.department || '—') : '—';
+  markUnsaved();
+}
+
+/* ============================================================
+   CURRENT USER + PENDING APPROVALS
+   ============================================================ */
+function getCurrentUser(){
+  return new Promise((resolve) => {
+    if(!window.ZOHO || !ZOHO.CREATOR || !ZOHO.CREATOR.UTIL){ resolve(''); return; }
+    ZOHO.CREATOR.UTIL.getInitParams().then(resp => {
+      resolve((resp && resp.loginUser) ? resp.loginUser : '');
+    }).catch(() => resolve(''));
+  });
+}
+function fetchPendingApprovals(){
+  if(!state.currentUserEmail){ return Promise.resolve(); }
+  const me = state.employees.find(e => e.email && e.email.toLowerCase() === state.currentUserEmail.toLowerCase());
+  if(!me){ return Promise.resolve(); }
+
+  const headCfg = { appName: APP_NAME, reportName: REPORTS.review, criteria: `(Department_Head == ${me.ID} && Status == "Submitted for Approval")`, page:1, pageSize:200 };
+  const hrCfg   = { appName: APP_NAME, reportName: REPORTS.review, criteria: `(HR_Approver == ${me.ID} && Status == "Head Approved")`, page:1, pageSize:200 };
+
+  const headP = ZOHO.CREATOR.API.getAllRecords(headCfg).then(r => (r && r.data ? r.data : [])).catch(() => []);
+  const hrP   = ZOHO.CREATOR.API.getAllRecords(hrCfg).then(r => (r && r.data ? r.data : [])).catch(() => []);
+
+  return Promise.all([headP, hrP]).then(([headRecs, hrRecs]) => {
+    state.pendingApprovals = [
+      ...headRecs.map(r => ({ review: r, role: 'head' })),
+      ...hrRecs.map(r => ({ review: r, role: 'hr' }))
+    ];
+    renderApprovalsTabVisibility();
+    renderApprovalsList();
+  });
+}
+function renderApprovalsTabVisibility(){
+  const tabRow = document.getElementById('tabRow');
+  const badge = document.getElementById('approvalBadge');
+  if(state.pendingApprovals.length > 0){
+    tabRow.style.display = 'flex';
+    badge.style.display = 'inline-block';
+    badge.textContent = state.pendingApprovals.length;
+  } else {
+    tabRow.style.display = 'none';
+  }
+}
+function switchTab(tab){
+  document.getElementById('appraisalView').style.display = tab==='appraisal' ? '' : 'none';
+  document.getElementById('approvalsView').style.display = tab==='approvals' ? '' : 'none';
+  document.getElementById('tabAppraisal').classList.toggle('active', tab==='appraisal');
+  document.getElementById('tabApprovals').classList.toggle('active', tab==='approvals');
+  document.getElementById('saveBtn').style.display = tab==='appraisal' ? '' : 'none';
+}
+
+/* ============================================================
+   APPROVALS LIST + DETAIL
+   ============================================================ */
+function empNameFromId(id){
+  const e = state.employees.find(x => x.ID === id);
+  return e ? e.name : '';
+}
+function renderApprovalsList(){
+  const el = document.getElementById('approvalsList');
+  if(state.pendingApprovals.length === 0){
+    el.innerHTML = `<div style="color:var(--muted); font-size:13px;">No pending approvals.</div>`;
+    return;
+  }
+  el.innerHTML = state.pendingApprovals.map((p, idx) => {
+    const r = p.review;
+    const empId = r.Employee_Lookup ? (r.Employee_Lookup.ID || r.Employee_Lookup) : '';
+    const name = empNameFromId(empId) || r.Employee_Lookup?.zc_display_value || '—';
+    return `
+      <div class="approval-card">
+        <div>
+          <strong>${escapeHtml(name)}</strong>
+          <div class="meta">${escapeHtml(r.Quarter||'')} ${escapeHtml(r.Year_field||'')} · Overall Rating: ${escapeHtml(r.Overall_Rating||'—')}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="role-tag">${p.role === 'head' ? 'DEPT HEAD REVIEW' : 'HR FINAL REVIEW'}</span>
+          <button class="small" onclick="openApproval(${idx})">Open</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+function openApproval(idx){
+  const p = state.pendingApprovals[idx];
+  const r = p.review;
+  const empId = r.Employee_Lookup ? (r.Employee_Lookup.ID || r.Employee_Lookup) : '';
+  const empName = empNameFromId(empId);
+  const quarter = r.Quarter || '';
+  const year = r.Year_field || '';
+
+  const kraCfg = { appName: APP_NAME, reportName: REPORTS.kra, criteria: `(Employee_Name == "${empName}" && Quarter == "${quarter}" && Year_field1 == "${year}")`, page:1, pageSize:200 };
+  const compCfg = { appName: APP_NAME, reportName: REPORTS.competency, criteria: `(Employee_Name1 == "${empName}" && Quarter == "${quarter}" && Year_field1 == "${year}")`, page:1, pageSize:200 };
+
+  Promise.all([
+    ZOHO.CREATOR.API.getAllRecords(kraCfg).then(r2 => r2 && r2.data ? r2.data : []).catch(()=>[]),
+    ZOHO.CREATOR.API.getAllRecords(compCfg).then(r2 => r2 && r2.data ? r2.data : []).catch(()=>[])
+  ]).then(([kraRecs, compRecs]) => {
+    const goalFetches = kraRecs.map(k => {
+      const goalCfg = { appName: APP_NAME, reportName: REPORTS.goal, criteria: `(KRA == ${k.ID})`, page:1, pageSize:200 };
+      return ZOHO.CREATOR.API.getAllRecords(goalCfg).then(r3 => ({ kra:k, goals: (r3 && r3.data) ? r3.data : [] })).catch(()=>({kra:k, goals:[]}));
+    });
+    Promise.all(goalFetches).then(kraGoalPairs => {
+      state.activeApproval = { idx, review:r, role:p.role, kras:kraGoalPairs, competencies:compRecs };
+      renderApprovalDetail();
+    });
+  });
+}
+function renderApprovalDetail(){
+  const a = state.activeApproval;
+  if(!a){ document.getElementById('approvalDetailContainer').innerHTML=''; return; }
+  const readOnlyHead = a.role === 'hr'; // HR stage: appraiser ratings are locked, just reviewing
+
+  let html = `<div class="section">
+    <div class="section-head"><h2>Review Detail</h2>
+      <button class="small danger" onclick="closeApproval()">Close</button>
+    </div>`;
+
+  a.kras.forEach(pair => {
+    html += `<div class="approval-detail-block">
+      <strong>${escapeHtml(pair.kra.KRA_Name||'')}</strong>
+      <div style="font-size:12px; color:var(--muted); margin-top:4px;">${escapeHtml(pair.kra.Description||'')}</div>`;
+    pair.goals.forEach(g => {
+      html += `<div class="approval-goal-row">
+        <div><label>Task</label><div class="readonly-box">${escapeHtml(g.Goal_Name||'')}</div></div>
+        <div><label>Self Rating</label><div class="readonly-box">${escapeHtml(g.Self_Rating||'—')}</div></div>
+        <div><label>Achievement</label><div class="readonly-box">${escapeHtml(g.Achievement||'—')}</div></div>
+        <div><label>Appraiser Rating</label>
+          ${a.role==='head'
+            ? `<input type="number" min="1" max="5" value="${escapeAttr(g.Appraiser_Rating||'')}" data-goal-id="${g.ID}" class="appr-rating-input">`
+            : `<div class="readonly-box">${escapeHtml(g.Appraiser_Rating||'—')}</div>`}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  if(a.competencies.length){
+    html += `<div class="approval-detail-block"><strong>Role Attributes</strong>`;
+    a.competencies.forEach(c => {
+      html += `<div class="approval-goal-row" style="grid-template-columns:2fr 1fr 1fr;">
+        <div><label>Attribute</label><div class="readonly-box">${escapeHtml(c.Attribute_Name||'')}</div></div>
+        <div><label>Self / Current Rating</label><div class="readonly-box">${escapeHtml(c.Rating||'—')}</div></div>
+        <div></div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div style="margin-top:16px;">
+    ${a.role==='head'
+      ? `<button class="solid" onclick="approveAsHead()">Approve — Send to HR</button>`
+      : `<button class="solid" onclick="approveAsHR()">Final Approve</button>`}
+  </div></div>`;
+
+  document.getElementById('approvalDetailContainer').innerHTML = html;
+}
+function closeApproval(){ state.activeApproval = null; document.getElementById('approvalDetailContainer').innerHTML=''; }
+
+function approveAsHead(){
+  const a = state.activeApproval;
+  const inputs = document.querySelectorAll('.appr-rating-input');
+  const updates = Array.from(inputs).map(inp => {
+    const goalId = inp.getAttribute('data-goal-id');
+    const val = inp.value;
+    return creatorUpdateRecord(REPORTS.goal, goalId, { Appraiser_Rating: val });
+  });
+  Promise.all(updates).then(() => {
+    return creatorUpdateRecord(REPORTS.review, a.review.ID, { Status: "Head Approved" });
+  }).then(() => {
+    setStatus('✅ Approved and sent to HR.', true);
+    closeApproval();
+    refreshApprovals();
+  }).catch(err => { console.error('APPROVE ERROR', err); setStatus('Approval failed — check console.', false); });
+}
+function approveAsHR(){
+  const a = state.activeApproval;
+  creatorUpdateRecord(REPORTS.review, a.review.ID, { Status: "Approved" }).then(() => {
+    setStatus('✅ Final approval complete.', true);
+    closeApproval();
+    refreshApprovals();
+  }).catch(err => { console.error('APPROVE ERROR', err); setStatus('Approval failed — check console.', false); });
+}
+function refreshApprovals(){ fetchPendingApprovals(); }
+
+/* ============================================================
    SETTINGS: SECTION WEIGHTS + RATING MAP
    ============================================================ */
 function updateSectionWeight(){
   state.settings.kraSectionWeight = parseFloat(document.getElementById('kraSectionWeight').value) || 0;
   state.settings.roleSectionWeight = parseFloat(document.getElementById('roleSectionWeight').value) || 0;
-  redistributeKRAWeights();
-  redistributeAttrWeights();
-  renderAll(); markUnsaved();
+  redistributeKRAWeights(); redistributeAttrWeights(); renderAll(); markUnsaved();
 }
 function renderRatingMap(){
   const grid = document.getElementById('ratingMapGrid');
@@ -248,8 +518,6 @@ function ratingToPercent(rating){
 
 /* ============================================================
    AUTO-DISTRIBUTION
-   Splits a total evenly across N items, giving any rounding
-   remainder to the last item so the sum always matches exactly.
    ============================================================ */
 function distributeEvenly(total, count){
   if(count<=0) return [];
@@ -339,7 +607,7 @@ function renderKRAs(){
               <div><label>Self Rating (1–5)</label>
                 <input type="number" min="1" max="5" value="${escapeAttr(g.selfRating)}" onchange="updateGoalField('${kra.id}','${g.id}','selfRating',this.value)"></div>
               <div><label>Appraiser Rating (1–5)</label>
-                <input type="number" min="1" max="5" value="${escapeAttr(g.apprRating)}" onchange="updateGoalField('${kra.id}','${g.id}','apprRating',this.value)"></div>
+                <input type="number" min="1" max="5" value="${escapeAttr(g.apprRating)}" disabled placeholder="Set by Dept Head"></div>
             </div>
           </div>
         `).join('')}
@@ -360,7 +628,7 @@ function renderKRAs(){
 }
 
 /* ============================================================
-   ROLE ATTRIBUTES (dynamic list, auto weightage)
+   ROLE ATTRIBUTES
    ============================================================ */
 function addAttribute(){
   state.attributes.push({id:'a'+(attrSeq++), name:'', weightage:0, rating:''});
@@ -424,8 +692,7 @@ function renderOverall(){
 function setOverall(l){ state.overallRating=l; renderOverall(); markUnsaved(); }
 
 /* ============================================================
-   SCORE CALCULATION (kept internally for the saved record —
-   no longer shown on screen, per request)
+   SCORE CALCULATION
    ============================================================ */
 function computeScores(){
   let kraContribution = 0;
@@ -476,12 +743,16 @@ function setStatus(msg, ok){
 }
 function creatorAddRecord(formName, data){
   return new Promise((resolve, reject) => {
-    const config = {
-      appName: "assest-management",   // app LINK NAME only, not the full URL
-      formName: formName,
-      data: { "data": data }                       // NOT payload: { data: data }
-    };
+    const config = { appName: APP_NAME, formName: formName, data: { "data": data } };
     ZOHO.CREATOR.API.addRecord(config).then(resp => {
+      if(resp && resp.code === 3000){ resolve(resp.data); } else { reject(resp); }
+    }).catch(reject);
+  });
+}
+function creatorUpdateRecord(reportName, id, data){
+  return new Promise((resolve, reject) => {
+    const config = { appName: APP_NAME, reportName: reportName, id: id, data: { "data": data } };
+    ZOHO.CREATOR.API.updateRecord(config).then(resp => {
       if(resp && resp.code === 3000){ resolve(resp.data); } else { reject(resp); }
     }).catch(reject);
   });
@@ -500,14 +771,22 @@ async function saveAll(){
     }
   }
 
+  const empId = document.getElementById('empSelect').value;
+  const deptHeadId = document.getElementById('deptHeadSelect').value;
+  const hrApproverId = document.getElementById('hrApproverSelect').value;
+  const statusVal = document.getElementById('statusSelect').value;
+  const emp = state.employees.find(e => e.ID === empId);
+
+  if(!empId){ setStatus('❌ Please select an Employee before saving.', false); return; }
+  if(statusVal === 'Submitted for Approval' && !deptHeadId){ setStatus('❌ Please select a Department Head before submitting for approval.', false); return; }
+
   setStatus('Saving…', null);
   try{
-    const employee = document.getElementById('empName').value;
+    const employee = emp ? emp.name : '';
     const appraiser = document.getElementById('appraiserName').value;
-    const department = document.getElementById('deptName').value;
+    const department = emp ? emp.department : '';
     const year = document.getElementById('yearInput').value;
     const quarter = state.quarter;
-    if(!employee){ setStatus('Employee Name is required before saving.', false); return; }
 
     for(const kra of state.kras){
       if(!kra.name) continue;
@@ -520,7 +799,7 @@ async function saveAll(){
         if(!goal.name) continue;
         await creatorAddRecord("Goal", {
           Goal_Name: goal.name, Description: goal.name, KRA: kraId, Weightage: goal.weightage||'',
-          Achievement: goal.achievement||'', Self_Rating: goal.selfRating||'', Appraiser_Rating: goal.apprRating||'',
+          Achievement: goal.achievement||'', Self_Rating: goal.selfRating||'', Appraiser_Rating: '',
           Data_Source: "Manual"
         });
       }
@@ -534,16 +813,20 @@ async function saveAll(){
     }
     const scores = computeScores();
     await creatorAddRecord("Review", {
-      Employee_Name: employee, Appraiser_Name: appraiser, Department: department, Quarter: quarter, Year_field: year,
+      Employee_Lookup: empId,
+      Department_Head: deptHeadId || '',
+      HR_Approver: hrApproverId || '',
+      Status: statusVal,
+      Appraiser_Name: appraiser, Department: department, Quarter: quarter, Year_field: year,
       Facilitating_Factors1: document.getElementById('facFactors').value,
       Constraining_Factors: document.getElementById('conFactors').value,
       Outstanding_Achievement: document.getElementById('outAchieve').value,
       Appraiser_Comments: document.getElementById('apprComments').value,
       My_Learnings: document.getElementById('myLearnings').value,
       Overall_Rating: state.overallRating || '',
-KRA_Score: parseFloat(scores.kraContribution.toFixed(2)) || 0,
-Competency_Score: parseFloat(scores.attrContribution.toFixed(2)) || 0,
-Final_Score: parseFloat(scores.overall.toFixed(2)) || 0
+      KRA_Score: parseFloat(scores.kraContribution.toFixed(2)) || 0,
+      Competency_Score: parseFloat(scores.attrContribution.toFixed(2)) || 0,
+      Final_Score: parseFloat(scores.overall.toFixed(2)) || 0
     });
     for(const t of state.training){
       if(!t.need) continue;
@@ -552,7 +835,7 @@ Final_Score: parseFloat(scores.overall.toFixed(2)) || 0
         Employee_Name: employee, Quarter1: quarter, Year_field: year
       });
     }
-    setStatus('✅ Saved successfully to Zoho Creator.', true);
+    setStatus(statusVal==='Submitted for Approval' ? '✅ Submitted for approval.' : '✅ Saved as draft.', true);
   } catch(err){
     console.error('SAVE ERROR', err);
     setStatus('Save failed — check console for details.', false);
@@ -560,22 +843,13 @@ Final_Score: parseFloat(scores.overall.toFixed(2)) || 0
 }
 function buildPayload(){
   return {
-    employee: document.getElementById('empName').value,
-    appraiser: document.getElementById('appraiserName').value,
-    department: document.getElementById('deptName').value,
-    year: document.getElementById('yearInput').value,
-    quarter: state.quarter,
-    settings: state.settings,
-    kras: state.kras,
-    attributes: state.attributes,
+    quarter: state.quarter, settings: state.settings, kras: state.kras, attributes: state.attributes,
     facilitatingFactors: document.getElementById('facFactors').value,
     constrainingFactors: document.getElementById('conFactors').value,
     outstandingAchievement: document.getElementById('outAchieve').value,
     appraiserComments: document.getElementById('apprComments').value,
     myLearnings: document.getElementById('myLearnings').value,
-    training: state.training,
-    overallRating: state.overallRating,
-    computedScores: computeScores()
+    training: state.training, overallRating: state.overallRating, computedScores: computeScores()
   };
 }
 function exportJSON(){
@@ -602,8 +876,14 @@ renderTraining();
 renderOverall();
 
 if(window.ZOHO && ZOHO.CREATOR){
-  ZOHO.CREATOR.init().then(function(){ setStatus('Connected to Creator — ready to save.', true); })
-    .catch(function(err){ console.error('Widget SDK init failed', err); setStatus('Widget not initialized — open this inside Creator, not standalone.', false); });
+  ZOHO.CREATOR.init().then(async function(){
+    setStatus('Connected to Creator — loading employees…', true);
+    await fetchEmployees();
+    populateEmployeeDropdowns();
+    state.currentUserEmail = await getCurrentUser();
+    await fetchPendingApprovals();
+    setStatus('Ready to save.', true);
+  }).catch(function(err){ console.error('Widget SDK init failed', err); setStatus('Widget not initialized — open this inside Creator, not standalone.', false); });
 } else {
   setStatus('Zoho Creator SDK not detected — running standalone (saves will fail).', false);
 }
