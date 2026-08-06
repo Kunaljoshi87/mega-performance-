@@ -476,12 +476,13 @@ function setStatus(msg, ok){
 }
 function creatorAddRecord(formName, data){
   return new Promise((resolve, reject) => {
-    ZOHO.CREATOR.DATA.addRecord({
-      appName: "creatorapp.zoho.in/megaengg/asset-management",   // TODO: confirm exact app link name
+    const config = {
+      appName: "assest-management",   // app LINK NAME only, not the full URL
       formName: formName,
-      payload: { data: data }
-    }).then(resp => {
-      if(resp && resp.code===3000){ resolve(resp.data); } else { reject(resp); }
+      data: data                       // NOT payload: { data: data }
+    };
+    ZOHO.CREATOR.API.addRecord(config).then(resp => {
+      if(resp && resp.code === 3000){ resolve(resp.data); } else { reject(resp); }
     }).catch(reject);
   });
 }
