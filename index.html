@@ -6,7 +6,7 @@
 <title>Performance Appraisal — Mega Engineering</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+<script src="https://static.zohocdn.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
 <style>
   :root{
     --bg:#F4F6F8; --panel:#FFFFFF; --line:#D7DEE5;
@@ -250,7 +250,6 @@
 /* ============================================================
    CONSTANTS
    ============================================================ */
-const APP_NAME = "assest-management";
 const REPORTS = { employees:"All_Employees", kra:"KRA_Report", goal:"Goal_Report", competency:"Competency_Report", review:"Review_Report" };
 const FORMS = { kra:"KRA", goal:"Goal", competency:"Competency", review:"Review", training:"Training_Need" };
 
@@ -285,12 +284,12 @@ function empDisplayName(rec){
   const v = rec.Employee_Name;
   if(!v) return rec.ID;
   if(typeof v === 'string') return v;
-  if(typeof v === 'object') return [v.prefix,v.first_name,v.last_name,v.suffix].filter(Boolean).join(' ').trim() || rec.ID;
+  if(typeof v === 'object') return v.display_value || v.zc_display_value || [v.prefix,v.first_name,v.last_name,v.suffix].filter(Boolean).join(' ').trim() || rec.ID;
   return String(v);
 }
 function fetchEmployees(){
   return new Promise((resolve) => {
-    const config = { appName: APP_NAME, reportName: REPORTS.employees, page:1, pageSize:200 };
+    const config = { reportName: REPORTS.employees, page:1, pageSize:200 };
     ZOHO.CREATOR.API.getAllRecords(config).then(resp => {
       const data = (resp && resp.data) ? resp.data : [];
       state.employees = data.map(r => ({ ID: r.ID, name: empDisplayName(r), department: r.Department || '', email: r.Email || '' }));
@@ -306,7 +305,7 @@ function populateEmployeeDropdowns(){
 }
 function onEmployeeChange(){
   const id = document.getElementById('empSelect').value;
-  const emp = state.employees.find(e => e.ID === id);
+  const emp = state.employees.find(e => String(e.ID) === String(id));
   document.getElementById('deptDisplay').textContent = emp ? (emp.department || '—') : '—';
   markUnsaved();
 }
@@ -315,20 +314,22 @@ function onEmployeeChange(){
    CURRENT USER + PENDING APPROVALS
    ============================================================ */
 function getCurrentUser() {
-    try {
-        const resp = ZOHO.CREATOR.UTIL.getInitParams();
-        return Promise.resolve(resp.loginUser || "");
-    } catch (e) {
-        return Promise.resolve("");
-    }
+  return ZOHO.CREATOR.UTIL.getInitParams()
+    .then(function(resp){
+      return (resp && resp.loginUser) ? resp.loginUser : "";
+    })
+    .catch(function(err){
+      console.error("getCurrentUser error", err);
+      return "";
+    });
 }
 function fetchPendingApprovals(){
   if(!state.currentUserEmail){ return Promise.resolve(); }
   const me = state.employees.find(e => e.email && e.email.toLowerCase() === state.currentUserEmail.toLowerCase());
   if(!me){ return Promise.resolve(); }
 
-  const headCfg = { appName: APP_NAME, reportName: REPORTS.review, criteria: `(Department_Head == ${me.ID} && Status == "Submitted for Approval")`, page:1, pageSize:200 };
-  const hrCfg   = { appName: APP_NAME, reportName: REPORTS.review, criteria: `(HR_Approver == ${me.ID} && Status == "Head Approved")`, page:1, pageSize:200 };
+  const headCfg = { reportName: REPORTS.review, criteria: `(Department_Head == ${me.ID} && Status == "Submitted for Approval")`, page:1, pageSize:200 };
+  const hrCfg   = { reportName: REPORTS.review, criteria: `(HR_Approver == ${me.ID} && Status == "Head Approved")`, page:1, pageSize:200 };
 
   const headP = ZOHO.CREATOR.API.getAllRecords(headCfg).then(r => (r && r.data ? r.data : [])).catch(() => []);
   const hrP   = ZOHO.CREATOR.API.getAllRecords(hrCfg).then(r => (r && r.data ? r.data : [])).catch(() => []);
@@ -365,7 +366,7 @@ function switchTab(tab){
    APPROVALS LIST + DETAIL
    ============================================================ */
 function empNameFromId(id){
-  const e = state.employees.find(x => x.ID === id);
+  const e = state.employees.find(x => String(x.ID) === String(id));
   return e ? e.name : '';
 }
 function renderApprovalsList(){
@@ -399,15 +400,15 @@ function openApproval(idx){
   const quarter = r.Quarter || '';
   const year = r.Year_field || '';
 
-  const kraCfg = { appName: APP_NAME, reportName: REPORTS.kra, criteria: `(Employee_Name == "${empName}" && Quarter == "${quarter}" && Year_field1 == "${year}")`, page:1, pageSize:200 };
-  const compCfg = { appName: APP_NAME, reportName: REPORTS.competency, criteria: `(Employee_Name1 == "${empName}" && Quarter == "${quarter}" && Year_field1 == "${year}")`, page:1, pageSize:200 };
+  const kraCfg = { reportName: REPORTS.kra, criteria: `(Employee_Name == "${empName}" && Quarter == "${quarter}" && Year_field1 == "${year}")`, page:1, pageSize:200 };
+  const compCfg = { reportName: REPORTS.competency, criteria: `(Employee_Name1 == "${empName}" && Quarter == "${quarter}" && Year_field1 == "${year}")`, page:1, pageSize:200 };
 
   Promise.all([
     ZOHO.CREATOR.API.getAllRecords(kraCfg).then(r2 => r2 && r2.data ? r2.data : []).catch(()=>[]),
     ZOHO.CREATOR.API.getAllRecords(compCfg).then(r2 => r2 && r2.data ? r2.data : []).catch(()=>[])
   ]).then(([kraRecs, compRecs]) => {
     const goalFetches = kraRecs.map(k => {
-      const goalCfg = { appName: APP_NAME, reportName: REPORTS.goal, criteria: `(KRA == ${k.ID})`, page:1, pageSize:200 };
+      const goalCfg = { reportName: REPORTS.goal, criteria: `(KRA == ${k.ID})`, page:1, pageSize:200 };
       return ZOHO.CREATOR.API.getAllRecords(goalCfg).then(r3 => ({ kra:k, goals: (r3 && r3.data) ? r3.data : [] })).catch(()=>({kra:k, goals:[]}));
     });
     Promise.all(goalFetches).then(kraGoalPairs => {
@@ -743,7 +744,7 @@ function setStatus(msg, ok){
 }
 function creatorAddRecord(formName, data){
   return new Promise((resolve, reject) => {
-    const config = { appName: APP_NAME, formName: formName, data: { "data": data } };
+    const config = { formName: formName, data: { "data": data } };
     ZOHO.CREATOR.API.addRecord(config).then(resp => {
       if(resp && resp.code === 3000){ resolve(resp.data); } else { reject(resp); }
     }).catch(reject);
@@ -751,7 +752,7 @@ function creatorAddRecord(formName, data){
 }
 function creatorUpdateRecord(reportName, id, data){
   return new Promise((resolve, reject) => {
-    const config = { appName: APP_NAME, reportName: reportName, id: id, data: { "data": data } };
+    const config = { reportName: reportName, id: id, data: { "data": data } };
     ZOHO.CREATOR.API.updateRecord(config).then(resp => {
       if(resp && resp.code === 3000){ resolve(resp.data); } else { reject(resp); }
     }).catch(reject);
@@ -775,10 +776,11 @@ async function saveAll(){
   const deptHeadId = document.getElementById('deptHeadSelect').value;
   const hrApproverId = document.getElementById('hrApproverSelect').value;
   const statusVal = document.getElementById('statusSelect').value;
-  const emp = state.employees.find(e => e.ID === empId);
+  const emp = state.employees.find(e => String(e.ID) === String(empId));
 
   if(!empId){ setStatus('❌ Please select an Employee before saving.', false); return; }
   if(statusVal === 'Submitted for Approval' && !deptHeadId){ setStatus('❌ Please select a Department Head before submitting for approval.', false); return; }
+  if(statusVal === 'Submitted for Approval' && !hrApproverId){ setStatus('❌ Please select an HR Approver before submitting for approval.', false); return; }
 
   setStatus('Saving…', null);
   try{
@@ -820,13 +822,9 @@ console.log("Final :", scores.overall);
 console.log("Type :", typeof scores.overall);
 
 await creatorAddRecord("Review", {
-                           
-                           
-                           
-                           {
       Employee_Lookup: empId,
       Department_Head: deptHeadId || '',
-    //  HR_Approver: hrApproverId || '',
+      HR_Approver: hrApproverId || '',
       Status: statusVal,
       Appraiser_Name: appraiser, Department: department, Quarter: quarter, Year_field: year,
       Facilitating_Factors1: document.getElementById('facFactors').value,
@@ -848,6 +846,7 @@ Final_Score: Number(scores.overall)    });
     setStatus(statusVal==='Submitted for Approval' ? '✅ Submitted for approval.' : '✅ Saved as draft.', true);
   } catch(err){
     console.error('SAVE ERROR', err);
+    if(err && err.responseText){ console.error('SAVE RESPONSE:', err.responseText); }
     setStatus('Save failed — check console for details.', false);
   }
 }
