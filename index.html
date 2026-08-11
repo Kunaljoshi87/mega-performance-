@@ -313,15 +313,83 @@ function onEmployeeChange(){
 /* ============================================================
    CURRENT USER + PENDING APPROVALS
    ============================================================ */
-function getCurrentUser() {
-  return ZOHO.CREATOR.UTIL.getInitParams()
-    .then(function(resp){
-      return (resp && resp.loginUser) ? resp.loginUser : "";
-    })
-    .catch(function(err){
-      console.error("getCurrentUser error", err);
-      return "";
-    });
+function getCurrentUser()
+{
+    try
+    {
+        var result =
+            ZOHO.CREATOR.UTIL.getInitParams();
+
+        console.log(
+            "getInitParams raw response:",
+            result
+        );
+
+        /*
+         * Some Creator environments return a Promise.
+         */
+        if(
+            result &&
+            typeof result.then === "function"
+        )
+        {
+            return result
+            .then(function(resp)
+            {
+                console.log(
+                    "getInitParams async response:",
+                    resp
+                );
+
+                if(
+                    resp &&
+                    resp.loginUser
+                )
+                {
+                    return resp.loginUser;
+                }
+
+                return "";
+            })
+            .catch(function(err)
+            {
+                console.error(
+                    "getInitParams async error:",
+                    err
+                );
+
+                return "";
+            });
+        }
+
+
+        /*
+         * Your current Creator environment appears
+         * to return the object directly.
+         */
+        if(
+            result &&
+            result.loginUser
+        )
+        {
+            return Promise.resolve(
+                result.loginUser
+            );
+        }
+
+
+        return Promise.resolve("");
+
+    }
+    catch(err)
+    {
+        console.error(
+            "getCurrentUser error:",
+            err
+        );
+
+        return Promise.resolve("");
+    }
 }
 function fetchPendingApprovals(){
   if(!state.currentUserEmail){ return Promise.resolve(); }
