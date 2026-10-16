@@ -898,7 +898,9 @@ async function saveAll(){
     /* ---- saved OK: keep a snapshot and reveal the Download PDF button ---- */
     lastSavedPDF = snapshotForPDF();
     document.getElementById('dlPdfBtn').style.display = '';
-    setStatus((statusVal==='Submitted for Approval' ? '✅ Submitted for approval.' : '✅ Saved as draft.') + ' You can now download the PDF →', true);
+ //   setStatus((statusVal==='Submitted for Approval' ? '✅ Submitted for approval.' : '✅ Saved as draft.') + ' You can now download the PDF →', true);
+        setStatus(statusVal==='Submitted for Approval' ? '✅ Submitted for approval. Preparing PDF…' : '✅ Saved as draft. Preparing PDF…', true);
+    await generatePDF(lastSavedPDF);
   } catch(err){
     console.error('SAVE ERROR', err);
     if(err && err.responseText){ console.error('SAVE RESPONSE:', err.responseText); }
