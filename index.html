@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Performance Appraisal — Mega Engineering</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://static.zohocdn.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
@@ -16,9 +16,11 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
-  body{padding:24px 28px 90px; min-height:100vh;}
+  body{padding:24px 28px 100px; min-height:100vh;}
+  .wrap{max-width:1150px; margin:0 auto;}
   h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif; margin:0;}
   .mono{font-family:'IBM Plex Mono',monospace;}
+  .hidden{display:none !important;}
   input,textarea,select{
     background:#F9FAFB; border:1px solid var(--line); color:var(--text);
     font-family:'Inter',sans-serif; font-size:13px; padding:8px 10px; width:100%; outline:none;
@@ -27,6 +29,7 @@
   input:disabled,select:disabled{background:#EEF1F4; color:var(--muted); cursor:not-allowed;}
   textarea{resize:vertical; min-height:60px;}
   label{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); display:block; margin-bottom:4px;}
+  .req{color:var(--red);}
   button{
     font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.04em; text-transform:uppercase;
     background:transparent; border:1px solid var(--navy); color:var(--navy); padding:8px 14px; cursor:pointer;
@@ -35,47 +38,56 @@
   button.danger{border-color:var(--red); color:var(--red);}
   button.danger:hover{background:var(--red); color:#FFFFFF;}
   button.solid{background:var(--navy); color:#FFFFFF;}
-  button.green{background:var(--green); border-color:var(--green); color:#FFFFFF;}
-  button.green:hover{background:#17724A;}
   button.small{padding:5px 10px; font-size:10px;}
   button:disabled{opacity:.4; cursor:not-allowed;}
   button:disabled:hover{background:transparent; color:var(--navy);}
+  button.solid:disabled:hover{background:var(--navy); color:#fff;}
 
-  .titleblock{
-    border:1px solid var(--line); background:var(--panel); padding:20px 24px; margin-bottom:20px;
-    box-shadow:0 1px 3px rgba(31,41,55,.06); border-top:3px solid var(--navy);
-  }
+  /* ===== LOGIN ===== */
+  .login-wrap{max-width:440px; margin:50px auto 0;}
+  .login-card{background:var(--panel); border:1px solid var(--line); border-top:3px solid var(--navy); padding:28px; box-shadow:0 1px 3px rgba(31,41,55,.06);}
+  .login-card h2{font-size:20px; color:var(--navy); margin-bottom:6px;}
+  .login-card p{font-size:13px; color:var(--muted); margin:0 0 18px; line-height:1.5;}
+  .login-card input{font-size:15px; padding:11px 12px;}
+  .login-card button{width:100%; margin-top:14px; padding:12px; font-size:12px;}
+  .login-msg{font-size:12px; margin-top:12px; min-height:16px; line-height:1.45;}
+  .login-msg.bad{color:var(--red);} .login-msg.ok{color:var(--green);}
+  .logo-row{display:flex; align-items:center; gap:12px; margin-bottom:18px;}
+  .logo-row img{height:34px;}
+
+  .who-bar{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; background:#EAF1FA; border:1px solid var(--navy); padding:10px 14px; margin-bottom:16px; font-size:13px;}
+
+  .titleblock{border:1px solid var(--line); background:var(--panel); padding:20px 24px; margin-bottom:20px; box-shadow:0 1px 3px rgba(31,41,55,.06); border-top:3px solid var(--navy);}
   .tb-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;}
   .quarter-row{display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;}
-  .quarter-btn{padding:8px 16px; border:1px solid var(--line); color:var(--muted); cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:11px;}
-  .quarter-btn.active{border-color:var(--navy); color:var(--navy); font-weight:600;}
+  .quarter-btn{padding:8px 16px; border:1px solid var(--line); color:var(--muted); cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:11px; background:#fff;}
+  .quarter-btn.active{border-color:var(--navy); color:var(--navy); font-weight:600; background:#EAF1FA;}
+  .readonly-box{background:#EEF1F4; padding:8px 10px; font-size:13px; border:1px solid var(--line); min-height:35px;}
+
+  /* ===== AUTO SCORE BAR ===== */
+  .score-bar{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:20px;}
+  .score-tile{background:var(--panel); border:1px solid var(--line); padding:12px 14px;}
+  .score-tile .k{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .score-tile .v{font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; margin-top:4px; color:var(--navy);}
+  .score-tile .s{font-size:11px; color:var(--muted); margin-top:2px;}
+  .score-tile.final{border-color:var(--navy); background:#EAF1FA;}
 
   .section{border:1px solid var(--line); background:var(--panel); padding:22px; margin-bottom:20px; box-shadow:0 1px 3px rgba(31,41,55,.05);}
   .section-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--line); padding-bottom:12px;}
   .section-head h2{font-size:17px; color:var(--navy);}
-  .weight-badge{font-family:'IBM Plex Mono',monospace; font-size:11px; padding:3px 9px; border:1px solid var(--line);}
-  .weight-badge.ok{color:var(--green); border-color:var(--green); background:#EAF7F0;}
-  .weight-badge.bad{color:var(--red); border-color:var(--red); background:#FBEAEA;}
-
-  .settings-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; align-items:end;}
-  .settings-note{font-size:11px; color:var(--muted); margin-top:10px;}
+  .weight-badge{font-family:'IBM Plex Mono',monospace; font-size:11px; padding:3px 9px; border:1px solid var(--green); color:var(--green); background:#EAF7F0;}
+  .note{font-size:11px; color:var(--muted); margin:-6px 0 14px;}
 
   .kra-block{border:1px dashed var(--line); padding:16px; margin-bottom:16px;}
-  .kra-block:last-child{margin-bottom:0;}
-  .kra-top{display:flex; gap:12px; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap;}
+  .kra-top{display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;}
   .kra-top .fields{flex:1; min-width:260px; display:grid; grid-template-columns:2fr 2fr 1fr; gap:10px;}
   .kra-actions{display:flex; gap:6px; flex-shrink:0; margin-top:16px;}
-  .kra-goal-total{font-size:11px; margin-top:8px; font-family:'IBM Plex Mono',monospace;}
-
-  .goal-row{border-top:1px solid var(--line); padding-top:12px; margin-top:12px; display:grid; grid-template-columns:1fr; gap:10px;}
-  .goal-row-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;}
+  .goal-row{border-top:1px solid var(--line); padding-top:12px; margin-top:12px; display:grid; grid-template-columns:1fr; gap:10px; padding-left:14px; border-left:3px solid #EAF1FA;}
+  .goal-row-header{display:flex; justify-content:space-between; align-items:center;}
   .goal-tag{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted);}
   .achievement-grid{display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px;}
-
   .attr-row{display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:10px; align-items:end; margin-bottom:10px;}
-  .attr-row:last-child{margin-bottom:0;}
-
-  .rating-map-row{text-align:center;}
+  .empty{color:var(--muted); font-size:13px;}
 
   .train-table{width:100%; border-collapse:collapse;}
   .train-table th{text-align:left; font-size:10px; text-transform:uppercase; color:var(--muted); padding:8px 6px; border-bottom:1px solid var(--line);}
@@ -85,1108 +97,1042 @@
   .overall-opt{border:1px solid var(--line); padding:10px 12px; cursor:pointer; font-size:13px; text-align:center;}
   .overall-opt.selected{border-color:var(--navy); color:var(--navy); background:#EAF1FA; font-weight:600;}
 
-  .footer-bar{
-    position:fixed; bottom:0; left:0; right:0; background:var(--panel); border-top:1px solid var(--line);
-    padding:14px 28px; display:flex; justify-content:space-between; align-items:center; z-index:10;
-    box-shadow:0 -2px 6px rgba(31,41,55,.06);
-  }
-  .status{font-size:11px; color:var(--muted); font-family:'IBM Plex Mono',monospace;}
-  .status.ok{color:var(--green);}
-  .status.bad{color:var(--red);}
-
   .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
-  @media(max-width:700px){
-    .two-col, .kra-top .fields, .achievement-grid, .attr-row{grid-template-columns:1fr;}
-  }
 
-  /* ===== TABS ===== */
-  .tab-row{display:flex; gap:8px; margin-bottom:20px;}
-  .tab-btn{padding:10px 18px; border:1px solid var(--line); background:var(--panel); color:var(--muted); cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px; position:relative;}
+  .footer-bar{position:fixed; bottom:0; left:0; right:0; background:var(--panel); border-top:1px solid var(--line);
+    padding:14px 28px; display:flex; justify-content:space-between; align-items:center; z-index:10;
+    box-shadow:0 -2px 6px rgba(31,41,55,.06); gap:12px; flex-wrap:wrap;}
+  .status{font-size:11px; color:var(--muted); font-family:'IBM Plex Mono',monospace;}
+  .status.ok{color:var(--green);} .status.bad{color:var(--red);}
+
+  .done-banner{border:1px solid var(--green); background:#EAF7F0; color:#145C3B; padding:14px 18px; margin-bottom:20px; font-size:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+
+  /* ===== TABS / APPROVALS ===== */
+  .tab-row{display:flex; gap:8px; margin-bottom:16px;}
+  .tab-btn{padding:10px 18px; border:1px solid var(--line); background:var(--panel); color:var(--muted); cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px;}
   .tab-btn.active{border-color:var(--navy); color:var(--navy); font-weight:600; background:#EAF1FA;}
   .tab-badge{background:var(--red); color:#fff; font-size:10px; padding:1px 6px; border-radius:10px; margin-left:6px;}
-
-  /* ===== APPROVALS ===== */
   .approval-card{border:1px solid var(--line); background:var(--panel); padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;}
   .approval-card .meta{font-size:12px; color:var(--muted);}
-  .approval-card .role-tag{font-family:'IBM Plex Mono',monospace; font-size:10px; padding:2px 8px; border:1px solid var(--amber); color:var(--amber);}
+  .role-tag{font-family:'IBM Plex Mono',monospace; font-size:10px; padding:2px 8px; border:1px solid var(--amber); color:var(--amber);}
   .approval-detail-block{border:1px dashed var(--line); padding:14px; margin-bottom:12px;}
-  .approval-goal-row{display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; align-items:end; margin-top:10px; padding-top:10px; border-top:1px solid var(--line);}
-  .readonly-box{background:#EEF1F4; padding:8px 10px; font-size:13px; border:1px solid var(--line); min-height:20px;}
+  .approval-goal-row{display:grid; grid-template-columns:2fr 2fr 1fr 1fr; gap:10px; align-items:end; margin-top:10px; padding-top:10px; border-top:1px solid var(--line);}
+
+  @media(max-width:760px){
+    body{padding:16px 16px 150px;}
+    .two-col, .kra-top .fields, .achievement-grid, .attr-row, .approval-goal-row{grid-template-columns:1fr;}
+    .footer-bar{padding:12px 16px;}
+  }
+  /* ===== STEP BANNER ===== */
+  .step-banner{display:flex; gap:14px; align-items:center; background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--navy); padding:14px 18px; margin-bottom:20px; flex-wrap:wrap;}
+  .step-banner .num{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; color:#fff; background:var(--navy); padding:4px 10px;}
+  .step-banner.rating{border-left-color:var(--amber);} .step-banner.rating .num{background:var(--amber);}
+  .step-banner.done{border-left-color:var(--green);} .step-banner.done .num{background:var(--green);}
+  .step-banner .t{font-weight:600; font-size:15px;} .step-banner .d{font-size:12px; color:var(--muted); margin-top:2px;}
+  .steps{display:flex; gap:6px; margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:10px;}
+  .steps span{padding:3px 8px; border:1px solid var(--line); color:var(--muted);}
+  .steps span.on{border-color:var(--navy); color:var(--navy); font-weight:600;}
+  .ro{background:#EEF1F4; padding:8px 10px; font-size:13px; border:1px solid var(--line); min-height:35px; white-space:pre-wrap;}
+  .rate-grid{display:grid; grid-template-columns:3fr 3fr 1fr 1.3fr; gap:10px; align-items:start;}
+  .loading-box{padding:40px; text-align:center; color:var(--muted); font-size:13px;}
+  @media(max-width:760px){ .rate-grid{grid-template-columns:1fr;} .steps{margin-left:0;} }
 </style>
 </head>
 <body>
 
-<div class="tab-row" id="tabRow" style="display:none;">
-  <div class="tab-btn active" id="tabAppraisal" onclick="switchTab('appraisal')">My Appraisal</div>
-  <div class="tab-btn" id="tabApprovals" onclick="switchTab('approvals')">Approvals <span class="tab-badge" id="approvalBadge" style="display:none;">0</span></div>
+<!-- =================== EMAIL SIGN-IN =================== -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <div class="logo-row"><img class="mega-logo" alt="MEGA"><div><b>Performance Appraisal</b><div style="font-size:11px;color:var(--muted)">Mega Engineering</div></div></div>
+    <h2>Sign in</h2>
+    <p>Enter your official email address — the one registered in the Mega employee list.</p>
+    <label>Email address</label>
+    <input id="loginEmail" type="email" autocomplete="email" placeholder="name@mega.tc" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="solid" id="loginBtn" onclick="doLogin()" disabled>Continue</button>
+    <div class="login-msg" id="loginMsg">Connecting…</div>
+  </div>
 </div>
 
-<div id="appraisalView">
+<!-- =================== APPRAISAL PAGE =================== -->
+<div class="wrap hidden" id="appView">
+  <div class="who-bar">
+    <div>Signed in as <b id="whoName">—</b> · <span id="whoEmail" class="mono"></span></div>
+    <button class="small" onclick="logout()">Sign out</button>
+  </div>
 
-<div class="titleblock">
-  <div class="tb-grid">
-    <div>
-      <label>Employee</label>
-      <select id="empSelect" onchange="onEmployeeChange()"><option value="">Loading employees…</option></select>
+  <div class="titleblock">
+    <div class="logo-row" style="margin-bottom:14px;"><img class="mega-logo" alt="MEGA"><h2 style="font-size:18px;">Performance Appraisal Form</h2></div>
+    <div class="tb-grid">
+      <div><label>Employee</label><div class="readonly-box" id="empNameDisplay">—</div></div>
+      <div><label>Department</label><div class="readonly-box" id="deptDisplay">—</div></div>
+      <div><label>Name of Appraiser</label><input id="appraiserName" placeholder="e.g. Kunal Joshi" onchange="markUnsaved()"></div>
+      <div><label>Year</label><select id="yearSelect" onchange="changePeriod()"></select></div>
     </div>
-    <div><label>Appraiser Name</label><input id="appraiserName" placeholder="e.g. Kunal Joshi"></div>
-    <div><label>Department</label><div class="readonly-box" id="deptDisplay">—</div></div>
-    <div><label>Year</label><input id="yearInput" value="2026"></div>
+    <div class="quarter-row" id="quarterRow"></div>
   </div>
-  <div class="tb-grid" style="margin-top:16px;">
-    <div>
-      <label>Department Head (Approver)</label>
-      <select id="deptHeadSelect"><option value="">Loading employees…</option></select>
-    </div>
-    <div>
-      <label>HR Approver (Final)</label>
-      <select id="hrApproverSelect"><option value="">Loading employees…</option></select>
-    </div>
-    <div>
-      <label>Status</label>
-      <select id="statusSelect">
-        <option value="Draft">Draft (save only, don't submit)</option>
-        <option value="Submitted for Approval">Submitted for Approval</option>
-      </select>
-    </div>
-  </div>
-  <div class="quarter-row" id="quarterRow"></div>
+
+  <div id="stepBanner"></div>
+  <div id="pageBody"></div>
 </div>
 
-<!-- ============ PERFORMANCE SETTINGS ============ -->
-<div class="section">
-  <div class="section-head">
-    <h2>Performance Settings</h2>
-    <span class="weight-badge" id="overallSplitBadge">—</span>
-  </div>
-  <div class="settings-row">
-    <div>
-      <label>KRA Section Weight (%)</label>
-      <input type="number" id="kraSectionWeight" value="80" min="0" max="100" onchange="updateSectionWeight()">
-    </div>
-    <div>
-      <label>Role Attribute Section Weight (%)</label>
-      <input type="number" id="roleSectionWeight" value="20" min="0" max="100" onchange="updateSectionWeight()">
-    </div>
-    <div>
-      <label>Total</label>
-      <input type="text" id="totalSectionWeight" value="100" disabled>
-    </div>
-  </div>
-  <div class="settings-note">
-    KRA and Role Attribute weightage below are auto-distributed equally from these totals — add/remove a KRA or attribute, or change the totals here, and every weight rebalances automatically.
-  </div>
-  <div style="margin-top:18px;">
-    <label style="margin-bottom:8px;">Rating → Percentage Mapping (editable)</label>
-    <div id="ratingMapGrid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px;"></div>
-  </div>
-</div>
-
-<!-- ============ KRA + GOALS ============ -->
-<div class="section">
-  <div class="section-head">
-    <h2>Targets (KRA) &amp; Goals</h2>
-    <span class="weight-badge" id="kraSectionBadge">—</span>
-  </div>
-  <div id="kraList"></div>
-  <div style="margin-top:14px;"><button class="solid" onclick="addKRA()">+ Add Target (KRA)</button></div>
-</div>
-
-<!-- ============ ROLE ATTRIBUTES ============ -->
-<div class="section">
-  <div class="section-head">
-    <h2>Role Attributes</h2>
-    <span class="weight-badge" id="attrSectionBadge">—</span>
-  </div>
-  <div id="attrList"></div>
-  <div style="margin-top:10px;"><button class="solid" onclick="addAttribute()">+ Add Role Attribute</button></div>
-</div>
-
-<div class="section two-col">
-  <div><label>Facilitating Factors</label><textarea id="facFactors" placeholder="Factors that helped achieve the targets"></textarea></div>
-  <div><label>Constraining Factors</label><textarea id="conFactors" placeholder="Factors that were constraints"></textarea></div>
-  <div><label>Outstanding Achievement / Significant Contribution</label><textarea id="outAchieve" placeholder="Quantified benefit to company"></textarea></div>
-  <div><label>Comments of Appraiser</label><textarea id="apprComments" placeholder="Comments"></textarea></div>
-</div>
-
-<div class="section">
-  <div class="section-head"><h2>My Learnings</h2></div>
-  <textarea id="myLearnings" placeholder="Visit outside organization / Customer Visit / Training / Reading / External Course"></textarea>
-</div>
-
-<div class="section">
-  <div class="section-head">
-    <h2>Training Need Identification</h2>
-    <button class="small" onclick="addTrainingRow()">+ Add Row</button>
-  </div>
-  <table class="train-table">
-    <thead><tr><th>Training Need</th><th>Expected Benefit</th><th>How Fulfilled</th><th style="width:50px"></th></tr></thead>
-    <tbody id="trainBody"></tbody>
-  </table>
-</div>
-
-<div class="section">
-  <div class="section-head"><h2>Overall Performance Rating</h2></div>
-  <div class="overall-options" id="overallOptions"></div>
-</div>
-
-</div><!-- /appraisalView -->
-
-<!-- ============ APPROVALS VIEW ============ -->
-<div id="approvalsView" style="display:none;">
-  <div class="section">
-    <div class="section-head"><h2>Pending Approvals</h2></div>
-    <div id="approvalsList"><div style="color:var(--muted); font-size:13px;">No pending approvals.</div></div>
-  </div>
-  <div id="approvalDetailContainer"></div>
-</div>
-
-<div class="footer-bar">
-  <span class="status" id="statusText">Not saved yet.</span>
-  <div style="display:flex; gap:10px;">
-    <button id="dlPdfBtn" class="green" style="display:none;" onclick="downloadSavedPDF()">⬇ Download PDF</button>
-    <button onclick="exportJSON()">Export as JSON</button>
-    <button class="solid" id="saveBtn" onclick="saveAll()">Save Appraisal</button>
+<div class="footer-bar hidden" id="footerBar">
+  <span class="status" id="statusText">—</span>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <button onclick="downloadPdf()">Download PDF</button>
+    <button class="solid" id="mainBtn" onclick="mainAction()">Submit</button>
   </div>
 </div>
 
 <script>
-/* ============================================================
-   CONSTANTS
-   ============================================================ */
-const REPORTS = { employees:"All_Employees", kra:"KRA_Report", goal:"Goal_Report", competency:"Competency_Report", review:"Review_Report" };
-const FORMS = { kra:"KRA", goal:"Goal", competency:"Competency", review:"Review", training:"Training_Need" };
+"use strict";
+/* ======================================================================
+   MEGA ENGINEERING — PERFORMANCE APPRAISAL  (one Creator widget, one page)
+   ----------------------------------------------------------------------
+   Sign in with email (must exist in the employee report), then per quarter:
+     STEP 1  first visit   → Set Targets: KRA + tasks (weightage automatic)
+                             saved to KRA, Goal, Competency + Review(Status "Draft")
+     STEP 2  second visit  → Self Rating only: achievement + self rating per
+                             task, role-attribute rating, factors, learnings,
+                             training, overall → Review Status "Submitted for Approval"
+     DONE    later visits  → read-only + Download PDF
+   Uses only your EXISTING forms/fields. No Deluge functions, no Custom API.
+   ====================================================================== */
 
-/* ============================================================
-   STATE
-   ============================================================ */
-const state = {
-  quarter: 'Q1',
-  settings: { kraSectionWeight: 80, roleSectionWeight: 20, ratingMap: {5:100, 4:90, 3:75, 2:50, 1:25} },
-  kras: [], attributes: [], training: [], overallRating: null,
-  employees: [],           // {ID, name, department, email}
-  currentUserEmail: '',
-  pendingApprovals: [],    // {review, role: 'head'|'hr'}
-  activeApproval: null     // { review, role, kras:[{kra,goals:[]}], competencies:[] }
+/* ============================ CONFIG ============================ */
+const CONFIG = {
+  EMPLOYEE_REPORTS: ["All_Employees", "Employ_to_Create_ticket_Report"],   // first one with data is used
+  EMP_FIELDS: { name:"Employee_Name", email:"Email", department:"Department" },
+  REPORTS: { kra:"KRA_Report", goal:"Goal_Report", competency:"Competency_Report", review:"Review_Report", training:"Training_Need_Report" },
+  FORMS:   { kra:"KRA", goal:"Goal", competency:"Competency", review:"Review", training:"Training_Need" },
+  STATUS:  { targetsSet:"Draft", selfRated:"Submitted for Approval" },     // existing Review.Status values
+  KRA_SHARE: 80, ROLE_SHARE: 20,               // total 100; no role attributes → targets get 100
+  RATING_PCT: { 5:100, 4:90, 3:75, 2:50, 1:25 },
+  MATCH_CREATOR_LOGIN: true,                   // typed email must equal the signed-in Creator user
+  PAGE_SIZE: 200, MAX_PAGES: 20
 };
-let kraSeq=1, goalSeq=1, attrSeq=1, trainSeq=1;
-let lastSavedPDF = null;   // snapshot of the last successfully saved appraisal (used by Download PDF)
+const RATING_LABELS = { 5:'5 - Outstanding', 4:'4 - Very Good', 3:'3 - Good', 2:'2 - Fair', 1:'1 - Poor' };
+const QUARTERS = [{id:'Q1',label:'Q1: Apr–Jun'},{id:'Q2',label:'Q2: Jul–Sep'},{id:'Q3',label:'Q3: Oct–Dec'},{id:'Q4',label:'Q4: Jan–Mar'}];
+const OVERALL_LABELS = ['Outstanding','Exceeds Expectations','Meets Expectations','Needs Improvement','Unacceptable'];
 
 /* ============================================================
-   QUARTER
+   PDF TEMPLATE ENGINE — exact replica of
+   "Performance Appraisal Form - Revised 3.1.2" (Word)
+   Page 1: Logo · Quarter strip · Name/Dept/Appraiser · Rating legend
+           Target-1..5 + Additional Target (tasks listed under each KRA)
+           Total · Appraiser's/HOD's Remark · Signatures
+   Page 2: Logo · Facilitating / Constraining / Outstanding / Comments
+           Role Attributes (5 rows + Total) · My Learnings
+           Training Need · Overall Performance Rating · Signatures
    ============================================================ */
-const quarters=[{id:'Q1',label:'Q1: Apr–Jun'},{id:'Q2',label:'Q2: Jul–Sep'},{id:'Q3',label:'Q3: Oct–Dec'},{id:'Q4',label:'Q4: Jan–Mar'}];
-function renderQuarters(){
-  document.getElementById('quarterRow').innerHTML = quarters.map(q =>
-    `<div class="quarter-btn ${state.quarter===q.id?'active':''}" onclick="setQuarter('${q.id}')">${q.label}</div>`).join('');
-}
-function setQuarter(q){ state.quarter=q; renderQuarters(); markUnsaved(); }
+const PDF_LOGO = "data:image/png;base64,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";
+const PDF_DEV_DIGITS = ['०','१','२','३','४','५','६','७','८','९'];
+const PDF_QUARTERS = [
+  {id:'Q1', label:'Q1: April to June'},
+  {id:'Q2', label:'Q2 : July to September'},
+  {id:'Q3', label:'Q3 :October- December'},
+  {id:'Q4', label:'Q4: January to March'}
+];
+const PDF_OVERALL = ['Outstanding','Exceeds Expectations','Meets Expectations','Needs Improvement','Unacceptable'];
+const PDF_FIXED_TARGETS = 5;      // "Five Targets are must"
+const PDF_MIN_ATTR_ROWS = 5;      // Role attribute table always shows 5 rows
+const PDF_MIN_TRAIN_ROWS = 1;
 
-/* ============================================================
-   EMPLOYEE DROPDOWNS
-   ============================================================ */
-function empDisplayName(rec){
-  const v = rec.Employee_Name;
-  if(!v) return rec.ID;
-  if(typeof v === 'string') return v;
-  if(typeof v === 'object') return v.display_value || v.zc_display_value || [v.prefix,v.first_name,v.last_name,v.suffix].filter(Boolean).join(' ').trim() || rec.ID;
+function pdfEsc(s){ return (s===null||s===undefined?'':String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function pdfMultiline(s){ return pdfEsc(s).replace(/\n/g,'<br>'); }
+function pdfDev(n){ return String(n).split('').map(d => /\d/.test(d) ? PDF_DEV_DIGITS[+d] : d).join(''); }
+function pdfNum(v){ const n = parseFloat(v); return isNaN(n) ? null : n; }
+function pdfFmt(n, dp){ if(n===null||n===undefined||isNaN(n)) return ''; const f = Number(n).toFixed(dp===undefined?1:dp); return f.replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1'); }
+function pdfPlain(v){
+  if(v===null||v===undefined) return '';
+  if(typeof v === 'object') return v.display_value || v.zc_display_value || '';
   return String(v);
 }
-function fetchEmployees(){
-  return new Promise((resolve) => {
-    const config = { reportName: REPORTS.employees, page:1, pageSize:200 };
-    ZOHO.CREATOR.API.getAllRecords(config).then(resp => {
-      const data = (resp && resp.data) ? resp.data : [];
-      state.employees = data.map(r => ({ ID: r.ID, name: empDisplayName(r), department: r.Department || '', email: r.Email || '' }));
-      resolve();
-    }).catch(err => { console.error('fetchEmployees error', err); state.employees=[]; resolve(); });
+
+/* Rating (1–5) → percentage using the editable rating map */
+function pdfRatingPct(model, rating){
+  const r = parseInt(rating, 10);
+  if(!r || !model.ratingMap || model.ratingMap[r] === undefined) return null;
+  return parseFloat(model.ratingMap[r]) || 0;
+}
+
+/* Weighted average rating of a KRA's tasks (by task weightage; equal if none) */
+function pdfKraAvgRating(kra, key){
+  let sum = 0, wt = 0, cnt = 0;
+  (kra.goals||[]).forEach(g => {
+    const r = pdfNum(g[key]); if(r===null) return;
+    const w = pdfNum(g.weightage) || 0;
+    sum += r * (w > 0 ? w : 1); wt += (w > 0 ? w : 1); cnt++;
   });
-}
-function populateEmployeeDropdowns(){
-  const opts = '<option value="">— Select —</option>' + state.employees.map(e => `<option value="${e.ID}">${escapeAttr(e.name)}</option>`).join('');
-  document.getElementById('empSelect').innerHTML = opts;
-  document.getElementById('deptHeadSelect').innerHTML = opts;
-  document.getElementById('hrApproverSelect').innerHTML = opts;
-}
-function onEmployeeChange(){
-  const id = document.getElementById('empSelect').value;
-  const emp = state.employees.find(e => String(e.ID) === String(id));
-  document.getElementById('deptDisplay').textContent = emp ? (emp.department || '—') : '—';
-  markUnsaved();
+  return cnt ? sum / wt : null;
 }
 
-/* ============================================================
-   CURRENT USER + PENDING APPROVALS
-   ============================================================ */
-function getCurrentUser(){
-  try{
-    var result = ZOHO.CREATOR.UTIL.getInitParams();
-    console.log("getInitParams raw response:", result);
-
-    // Some Creator environments return a Promise.
-    if(result && typeof result.then === "function"){
-      return result.then(function(resp){
-        console.log("getInitParams async response:", resp);
-        if(resp && resp.loginUser){ return resp.loginUser; }
-        return "";
-      }).catch(function(err){
-        console.error("getInitParams async error:", err);
-        return "";
-      });
-    }
-
-    // Other environments return the object directly.
-    if(result && result.loginUser){ return Promise.resolve(result.loginUser); }
-    return Promise.resolve("");
-  }
-  catch(err){
-    console.error("getCurrentUser error:", err);
-    return Promise.resolve("");
-  }
-}
-function fetchPendingApprovals(){
-  if(!state.currentUserEmail){ return Promise.resolve(); }
-  const me = state.employees.find(e => e.email && e.email.toLowerCase() === state.currentUserEmail.toLowerCase());
-  if(!me){ return Promise.resolve(); }
-
-  const headCfg = { reportName: REPORTS.review, criteria: `(Department_Head == ${me.ID} && Status == "Submitted for Approval")`, page:1, pageSize:200 };
-  const hrCfg   = { reportName: REPORTS.review, criteria: `(HR_Approver == ${me.ID} && Status == "Head Approved")`, page:1, pageSize:200 };
-
-  const headP = ZOHO.CREATOR.API.getAllRecords(headCfg).then(r => (r && r.data ? r.data : [])).catch(() => []);
-  const hrP   = ZOHO.CREATOR.API.getAllRecords(hrCfg).then(r => (r && r.data ? r.data : [])).catch(() => []);
-
-  return Promise.all([headP, hrP]).then(([headRecs, hrRecs]) => {
-    state.pendingApprovals = [
-      ...headRecs.map(r => ({ review: r, role: 'head' })),
-      ...hrRecs.map(r => ({ review: r, role: 'hr' }))
-    ];
-    renderApprovalsTabVisibility();
-    renderApprovalsList();
+/* KRA section score (out of KRA section weight) for 'selfRating' or 'apprRating' */
+function pdfKraScore(model, key){
+  let total = 0, any = false;
+  (model.kras||[]).forEach(kra => {
+    const kw = pdfNum(kra.weightage) || 0;
+    if(!kw || !(kra.goals||[]).length) return;
+    let ws = 0, wt = 0;
+    kra.goals.forEach(g => {
+      let r = g[key];
+      if(key === 'apprRating' && (r===''||r===null||r===undefined)) return;
+      const pct = pdfRatingPct(model, r); if(pct===null) return;
+      const gw = pdfNum(g.weightage) || 1;
+      ws += gw * pct; wt += gw; any = true;
+    });
+    if(wt > 0) total += kw * (ws / wt) / 100;
   });
+  return any ? total : null;
 }
-function renderApprovalsTabVisibility(){
-  const tabRow = document.getElementById('tabRow');
-  const badge = document.getElementById('approvalBadge');
-  if(state.pendingApprovals.length > 0){
-    tabRow.style.display = 'flex';
-    badge.style.display = 'inline-block';
-    badge.textContent = state.pendingApprovals.length;
-  } else {
-    tabRow.style.display = 'none';
-  }
-}
-function switchTab(tab){
-  document.getElementById('appraisalView').style.display = tab==='appraisal' ? '' : 'none';
-  document.getElementById('approvalsView').style.display = tab==='approvals' ? '' : 'none';
-  document.getElementById('tabAppraisal').classList.toggle('active', tab==='appraisal');
-  document.getElementById('tabApprovals').classList.toggle('active', tab==='approvals');
-  document.getElementById('saveBtn').style.display = tab==='appraisal' ? '' : 'none';
-  document.getElementById('dlPdfBtn').style.display = (tab==='appraisal' && lastSavedPDF) ? '' : 'none';
+function pdfAttrScore(model){
+  let total = 0, any = false;
+  (model.attributes||[]).forEach(a => {
+    const pct = pdfRatingPct(model, a.rating); if(pct===null) return;
+    total += (pdfNum(a.weightage)||0) * pct / 100; any = true;
+  });
+  return any ? total : null;
 }
 
-/* ============================================================
-   APPROVALS LIST + DETAIL
-   ============================================================ */
-function empNameFromId(id){
-  const e = state.employees.find(x => String(x.ID) === String(id));
-  return e ? e.name : '';
+/* ---------- Page-1 target block ---------- */
+function pdfTargetLabel(i){
+  const n = i + 1;
+  if(i < PDF_FIXED_TARGETS) return `Target-${n} (उद्दिष्ट ${pdfDev(n)} ) :`;
+  if(i === PDF_FIXED_TARGETS) return `Additional Target ( If any) : (उद्दिष्ट ${pdfDev(n)}):`;
+  return `Additional Target : (उद्दिष्ट ${pdfDev(n)}):`;
 }
-function renderApprovalsList(){
-  const el = document.getElementById('approvalsList');
-  if(state.pendingApprovals.length === 0){
-    el.innerHTML = `<div style="color:var(--muted); font-size:13px;">No pending approvals.</div>`;
+function pdfTargetBlock(kra, i){
+  const n = i + 1;
+  const label = pdfTargetLabel(i);
+  const achLabel = `Achievement: (प्राप्ति ${pdfDev(n)})`;
+  if(!kra || (!kra.name && !(kra.goals||[]).length)){
+    return `<tr class="pa-avoid"><td class="pa-tcell"><div class="pa-b">${label}</div><div class="pa-blank"></div><div class="pa-b">${achLabel}</div><div class="pa-blank-s"></div></td><td></td><td></td></tr>`;
+  }
+  const selfAvg = pdfKraAvgRating(kra, 'selfRating');
+  const apprAvg = pdfKraAvgRating(kra, 'apprRating');
+  const kw = pdfNum(kra.weightage);
+  let html = `<tr class="pa-avoid pa-target-row">
+    <td class="pa-tcell">
+      <div><span class="pa-b">${label}</span> <span class="pa-b">${pdfEsc(kra.name)}</span>${kw!==null?` <span class="pa-wt">(Weightage ${pdfFmt(kw,2)}%)</span>`:''}</div>
+      ${kra.description ? `<div class="pa-desc">${pdfMultiline(kra.description)}</div>` : ''}
+    </td>
+    <td class="pa-rc pa-b">${selfAvg!==null?pdfFmt(selfAvg,1):''}</td>
+    <td class="pa-rc pa-b">${apprAvg!==null?pdfFmt(apprAvg,1):''}</td>
+  </tr>`;
+  const goals = kra.goals || [];
+  if(!goals.length){
+    html += `<tr class="pa-avoid"><td class="pa-tcell pa-task"><div class="pa-b">${achLabel}</div><div class="pa-blank-s"></div></td><td></td><td></td></tr>`;
+  }
+  goals.forEach((g, gi) => {
+    const gw = pdfNum(g.weightage);
+    html += `<tr class="pa-avoid">
+      <td class="pa-tcell pa-task">
+        <div><span class="pa-tasktag">Task ${n}.${gi+1}${gw!==null?` · ${pdfFmt(gw,2)}%`:''}</span> ${pdfMultiline(g.name)}</div>
+        <div class="pa-ach"><span class="pa-b">${achLabel}</span> ${pdfMultiline(g.achievement)}</div>
+      </td>
+      <td class="pa-rc">${pdfEsc(g.selfRating)}</td>
+      <td class="pa-rc">${pdfEsc(g.apprRating)}</td>
+    </tr>`;
+  });
+  return html;
+}
+
+/* ---------- Full document ---------- */
+function buildAppraisalPdfHtml(model){
+  const m = model;
+  const kras = (m.kras||[]).filter(k => k && (k.name || (k.goals||[]).length));
+  const slots = Math.max(PDF_FIXED_TARGETS + 1, kras.length);
+  let targetRows = '';
+  for(let i = 0; i < slots; i++) targetRows += pdfTargetBlock(kras[i], i);
+
+  const kraW = pdfNum(m.kraSectionWeight); const roleW = pdfNum(m.roleSectionWeight);
+  const selfScore = pdfKraScore(m, 'selfRating');
+  const apprScore = pdfKraScore(m, 'apprRating');
+  const attrScore = pdfAttrScore(m);
+
+  const quarterCells = PDF_QUARTERS.map(q => {
+    const sel = q.id === m.quarter;
+    return `<td class="${sel?'pa-qsel':''}">${sel?`<b>${q.label.split(':')[0]}:</b>${q.label.substring(q.label.indexOf(':')+1)} ${pdfEsc(m.year||'')}`:q.label}</td>`;
+  }).join('');
+
+  const attrs = (m.attributes||[]).filter(a => a && a.name);
+  const attrRows = Math.max(PDF_MIN_ATTR_ROWS, attrs.length);
+  let attrHtml = '';
+  for(let i = 0; i < attrRows; i++){
+    const a = attrs[i];
+    attrHtml += `<tr><td class="pa-b pa-sno">${i+1}</td><td>${a?pdfEsc(a.name)+(pdfNum(a.weightage)!==null?` <span class="pa-wt">(${pdfFmt(a.weightage,2)}%)</span>`:''):''}</td><td class="pa-rc">${a?pdfEsc(a.rating):''}</td></tr>`;
+  }
+
+  const train = (m.training||[]).filter(t => t && (t.need||t.benefit||t.fulfilled));
+  const trainRows = Math.max(PDF_MIN_TRAIN_ROWS, train.length);
+  let trainHtml = '';
+  for(let i = 0; i < trainRows; i++){
+    const t = train[i] || {};
+    trainHtml += `<tr class="pa-avoid"><td>${pdfMultiline(t.need)}</td><td>${pdfMultiline(t.benefit)}</td><td>${pdfMultiline(t.fulfilled)}</td></tr>`;
+  }
+
+  const ovr = String(m.overallRating||'').toLowerCase();
+  const tick = l => `<span class="pa-tick">${ovr===l.toLowerCase()?'☑':'☐'}</span> ${l}`;
+
+  return `
+<div class="pa-pdf">
+  <!-- ================= PAGE 1 ================= -->
+  <div class="pa-page">
+    <div class="pa-head"><img class="pa-logo" src="${PDF_LOGO}" alt="MEGA"><div class="pa-title">Performance Appraisal Form</div></div>
+    <table class="pa-qtable"><tr>${quarterCells}</tr></table>
+    <div class="pa-info">
+      <div class="pa-info-row"><span class="pa-b">Name: ${pdfEsc(m.employeeName)}</span><span class="pa-b pa-dept">Department: ${pdfEsc(m.department)}</span></div>
+      <div class="pa-info-row"><span class="pa-b">Name of Appraiser:&nbsp; ${pdfEsc(m.appraiser)}</span></div>
+    </div>
+    <div class="pa-legend pa-b"><span class="pa-nw">Five Targets are must. Rating : 5 = Outstanding ( 96% and above), 4=Very Good ( 86%-95%) 3 = Good ( 71-85%) 2= Fair ( 50-70%)</span><br><span class="pa-nw">1= Poor ( below 50%)<span class="pa-gap2"></span>Target Achievement: ${pdfFmt(kraW===null?80:kraW,2)}% Weightage</span></div>
+    <table class="pa-grid pa-targets">
+      <thead><tr>
+        <th class="pa-th-main"><div class="pa-b">Performance Parameter, Targets and Achievements</div><div class="pa-th-sub">Targets to be linked to Company Goal/Departmental Goal/Cross Functional Team/ System Development/ Self Development/ People Development</div></th>
+        <th class="pa-th-r">Self Rating</th>
+        <th class="pa-th-r">Appraiser’s rating</th>
+      </tr></thead>
+      <tbody>
+        ${targetRows}
+        <tr class="pa-avoid"><td class="pa-total-cell"><span class="pa-b">Total</span> <span class="pa-wt">(KRA score out of ${pdfFmt(kraW===null?80:kraW,2)})</span></td><td class="pa-rc pa-b">${selfScore!==null?pdfFmt(selfScore,2):''}</td><td class="pa-rc pa-b">${apprScore!==null?pdfFmt(apprScore,2):''}</td></tr>
+        <tr class="pa-avoid"><td colspan="3" class="pa-remark"><span class="pa-b">Appraiser’s / HOD’s Remark:</span> ${pdfMultiline(m.hodRemark)}<div class="pa-blank-s"></div></td></tr>
+      </tbody>
+    </table>
+    <div class="pa-note pa-b">Signature of appraise is to confirm that feedback is given to him and rating given by appraiser is jointly agreed between Appraisee and Appraiser</div>
+    <div class="pa-sign pa-b">Signature Appraisee……………………………..Sign. Appraiser…………………………Sign. HOD</div>
+  </div>
+
+  <!-- ================= PAGE 2 ================= -->
+  <div class="pa-page pa-page2">
+    <div class="pa-head"><img class="pa-logo" src="${PDF_LOGO}" alt="MEGA"></div>
+    <table class="pa-grid pa-factors">
+      <tr class="pa-avoid"><td><span class="pa-b">Facilitating Factors</span>: उद्दिष्ट सुलभ करणारे&nbsp; घटक <i>(Appraisee to write which were the factors that helped to achieve the targets. Please give reference to specific target number)</i><div class="pa-fill">${pdfMultiline(m.facilitating)}</div></td></tr>
+      <tr class="pa-avoid"><td><span class="pa-b">Constraining Factors</span>: उद्दिष्ट साध्य करण्यासाठी आलेले अडथळे&nbsp;&nbsp; <i>(Appraisee to write the factors which were constraints to achieve the targets. Please give reference to specific target number)</i><div class="pa-fill">${pdfMultiline(m.constraining)}</div></td></tr>
+      <tr class="pa-avoid"><td><span class="pa-b">Outstanding Achievement/ Significant Contribution</span>: उल्लेखनीय कामगिरी/ योगदान&nbsp;&nbsp; <i>( Mention quantified benefits to company)</i>&nbsp; कंपनीला झालेला फायदा<div class="pa-fill">${pdfMultiline(m.outstanding)}</div></td></tr>
+      <tr class="pa-avoid"><td><span class="pa-b">Comments of Appraiser</span>: <i>(How facilitating factors will be reinforced and constraining factors will be reduced/ eliminated. Comment on Outstanding achievement)</i><div class="pa-fill">${pdfMultiline(m.comments)}</div></td></tr>
+    </table>
+    <div class="pa-attr-head pa-b"><span>Appraisal on Role Attributes:</span><span>${pdfFmt(roleW===null?20:roleW,2)}%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; weightage</span></div>
+    <div class="pa-p">Rating: 5 = Outstanding,&nbsp; 4= Very Good,&nbsp; 3= Good, 2 = Fair,&nbsp; 1= Poor</div>
+    <table class="pa-grid pa-attr">
+      <tr><th class="pa-sno">S.No</th><th>Role Attribute</th><th class="pa-th-r">Rating</th></tr>
+      ${attrHtml}
+      <tr><td></td><td class="pa-center pa-b">Total <span class="pa-wt">(Role score out of ${pdfFmt(roleW===null?20:roleW,2)})</span></td><td class="pa-rc pa-b">${attrScore!==null?pdfFmt(attrScore,2):''}</td></tr>
+    </table>
+    <div class="pa-center pa-b pa-sub">My Learnings</div>
+    <table class="pa-grid">
+      <tr><td>Appraisee to write details of learnings from: Visit outside organization/ Customer Visit/ Training/ Reading of book/ journal/ internet information/ External Course</td></tr>
+      <tr class="pa-avoid"><td class="pa-learn">${pdfMultiline(m.learnings)}</td></tr>
+    </table>
+    <div class="pa-b pa-sub2">Training Need Identification</div>
+    <div class="pa-p">Appraisee to identify the training needs to improve job performance in consultation with Appraiser</div>
+    <table class="pa-grid pa-train">
+      <tr><th>Training need</th><th>Expected benefit after training</th><th>How training need will be fulfilled ( Internal faculty/ Self-study/ Outside training</th></tr>
+      ${trainHtml}
+    </table>
+    <div class="pa-p"><span class="pa-b">OVERALL PERFORMANCE RATING</span>: (Tick <b>one</b> applicable word)</div>
+    <table class="pa-overall">
+      <tr><td>${tick('Outstanding')}</td><td>${tick('Exceeds Expectations')}</td><td>${tick('Meets Expectations')}</td></tr>
+      <tr><td>${tick('Needs Improvement')}</td><td>${tick('Unacceptable')}</td><td></td></tr>
+    </table>
+    <div class="pa-sign pa-b">Sign. Appraiser……………………………Sign. HOD…………………………</div>
+  </div>
+</div>`;
+}
+
+const PDF_CSS = `
+.pa-pdf{width:718px;background:#fff;color:#000;font-family:Calibri,Carlito,'Noto Sans','Nirmala UI','Noto Sans Devanagari',Arial,sans-serif;font-size:12px;line-height:1.3}
+.pa-pdf *{box-sizing:border-box}
+.pa-page{padding:4px 2px 0}
+.pa-page2{page-break-before:always;break-before:page}
+.pa-b{font-weight:700}
+.pa-head{display:flex;align-items:center;gap:60px;margin-bottom:6px}
+.pa-logo{width:85px;height:auto}
+.pa-title{font-weight:700;font-size:13.5px}
+.pa-qtable{border-collapse:collapse;width:100%;margin-bottom:16px}
+.pa-qtable td{border:1px solid #000;padding:2px 5px;font-style:italic;font-size:11.5px;white-space:nowrap}
+.pa-qsel{background:#E8EEF7}
+.pa-info{margin-bottom:10px}
+.pa-info-row{display:flex;margin-bottom:6px;font-size:12.5px}
+.pa-dept{margin-left:auto;margin-right:110px}
+.pa-legend{margin-bottom:4px;font-size:12px;word-spacing:0}
+.pa-nw{white-space:nowrap}
+.pa-gap2{display:inline-block;width:36px}
+.pa-grid{border-collapse:collapse;width:100%}
+.pa-grid th,.pa-grid td{border:1px solid #000;padding:3px 5px;vertical-align:top;text-align:left}
+.pa-grid th{font-weight:700}
+.pa-th-main{width:78%}
+.pa-th-sub{font-style:italic;font-weight:400;font-size:9.5px}
+.pa-th-r{width:11%;}
+.pa-tcell{min-height:60px}
+.pa-target-row td{border-bottom:none;padding-top:5px}
+.pa-task{border-top:none !important;padding-left:14px !important}
+.pa-tasktag{font-weight:700;font-size:10.5px;background:#EEF1F4;padding:0 4px;margin-right:2px}
+.pa-ach{margin-top:3px}
+.pa-desc{font-size:11px;font-style:italic;margin-top:2px}
+.pa-wt{font-weight:400;font-size:10px;color:#333}
+.pa-rc{text-align:center !important;vertical-align:middle !important}
+.pa-blank{height:30px}
+.pa-blank-s{height:14px}
+.pa-total-cell{text-align:center !important}
+.pa-remark{min-height:40px}
+.pa-note{font-size:10px;margin-top:3px}
+.pa-sign{margin-top:16px;font-size:12px}
+.pa-factors td{height:auto;padding:4px 5px 8px}
+.pa-fill{min-height:34px;margin-top:4px;font-size:12px}
+.pa-attr-head{display:flex;justify-content:space-between;padding-right:60px;margin-top:2px}
+.pa-p{margin:8px 0}
+.pa-sno{width:44px}
+.pa-center{text-align:center !important}
+.pa-sub{margin:2px 0 6px}
+.pa-sub2{margin-top:22px}
+.pa-learn{min-height:34px}
+.pa-train th{width:33.3%}
+.pa-overall{border-collapse:collapse;width:90%;margin-bottom:4px}
+.pa-overall td{padding:5px 0;font-weight:700;width:33%}
+.pa-tick{font-size:14px;font-weight:400}
+`;
+
+/* Inject PDF CSS once */
+(function(){ const st = document.createElement('style'); st.id = 'paPdfCss'; st.textContent = PDF_CSS; document.head.appendChild(st); })();
+
+function pdfSafeFileName(model){
+  return ('Performance_Appraisal_' + (model.employeeName||'Employee') + '_' + (model.quarter||'') + '_' + (model.year||''))
+    .replace(/[^A-Za-z0-9_\-]+/g,'_').replace(/_+/g,'_') + '.pdf';
+}
+
+/* Print-window fallback if html2pdf is unavailable / blocked */
+function pdfPrintFallback(html){
+  const w = window.open('', '_blank');
+  if(!w){ return false; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Performance Appraisal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+    <style>@page{size:A4;margin:10mm} body{margin:0} ${PDF_CSS} .pa-pdf{width:auto}</style></head><body>${html}
+    <script>window.onload=function(){setTimeout(function(){window.print();},400);}<\/script></body></html>`);
+  w.document.close();
+  return true;
+}
+
+/* Main entry: build + download PDF. Returns a Promise. */
+async function downloadAppraisalPdf(model, onStatus){
+  const say = onStatus || function(){};
+  const html = buildAppraisalPdfHtml(model);
+  if(typeof html2pdf === 'undefined'){
+    say('PDF library not loaded — opening print view (choose "Save as PDF").', null);
+    if(!pdfPrintFallback(html)) say('Pop-up blocked. Allow pop-ups to print / save PDF.', false);
     return;
   }
-  el.innerHTML = state.pendingApprovals.map((p, idx) => {
-    const r = p.review;
-    const empId = r.Employee_Lookup ? (r.Employee_Lookup.ID || r.Employee_Lookup) : '';
-    const name = empNameFromId(empId) || r.Employee_Lookup?.zc_display_value || '—';
-    return `
-      <div class="approval-card">
-        <div>
-          <strong>${escapeHtml(name)}</strong>
-          <div class="meta">${escapeHtml(r.Quarter||'')} ${escapeHtml(r.Year_field||'')} · Overall Rating: ${escapeHtml(r.Overall_Rating||'—')}</div>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span class="role-tag">${p.role === 'head' ? 'DEPT HEAD REVIEW' : 'HR FINAL REVIEW'}</span>
-          <button class="small" onclick="openApproval(${idx})">Open</button>
-        </div>
-      </div>`;
-  }).join('');
-}
-function openApproval(idx){
-  const p = state.pendingApprovals[idx];
-  const r = p.review;
-  const empId = r.Employee_Lookup ? (r.Employee_Lookup.ID || r.Employee_Lookup) : '';
-  const empName = empNameFromId(empId);
-  const quarter = r.Quarter || '';
-  const year = r.Year_field || '';
-
-  const kraCfg = { reportName: REPORTS.kra, criteria: `(Employee_Name == "${empName}" && Quarter == "${quarter}" && Year_field1 == "${year}")`, page:1, pageSize:200 };
-  const compCfg = { reportName: REPORTS.competency, criteria: `(Employee_Name1 == "${empName}" && Quarter == "${quarter}" && Year_field1 == "${year}")`, page:1, pageSize:200 };
-
-  Promise.all([
-    ZOHO.CREATOR.API.getAllRecords(kraCfg).then(r2 => r2 && r2.data ? r2.data : []).catch(()=>[]),
-    ZOHO.CREATOR.API.getAllRecords(compCfg).then(r2 => r2 && r2.data ? r2.data : []).catch(()=>[])
-  ]).then(([kraRecs, compRecs]) => {
-    const goalFetches = kraRecs.map(k => {
-      const goalCfg = { reportName: REPORTS.goal, criteria: `(KRA == ${k.ID})`, page:1, pageSize:200 };
-      return ZOHO.CREATOR.API.getAllRecords(goalCfg).then(r3 => ({ kra:k, goals: (r3 && r3.data) ? r3.data : [] })).catch(()=>({kra:k, goals:[]}));
+  say('Generating PDF…', null);
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:absolute;left:0;top:0;width:718px;background:#fff;z-index:-1;pointer-events:none;';
+  const prevScroll = [window.scrollX, window.scrollY]; window.scrollTo(0,0);
+  holder.innerHTML = html;
+  document.body.appendChild(holder);
+  try{
+    if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+    const imgs = Array.from(holder.querySelectorAll('img'));
+    await Promise.all(imgs.map(im => im.complete ? 1 : new Promise(r => { im.onload = im.onerror = r; })));
+    /* Render each form page separately so page 2 always starts on a fresh
+       sheet (no blank pages), while long target lists flow onto extra pages
+       without cutting a task row in half. */
+    const pages = Array.from(holder.querySelectorAll('.pa-page')).map(pg => {
+      const wrap = document.createElement('div');
+      wrap.className = 'pa-pdf';
+      const clone = pg.cloneNode(true);
+      clone.classList.remove('pa-page2');
+      wrap.appendChild(clone);
+      holder.appendChild(wrap);
+      return wrap;
     });
-    Promise.all(goalFetches).then(kraGoalPairs => {
-      state.activeApproval = { idx, review:r, role:p.role, kras:kraGoalPairs, competencies:compRecs };
-      renderApprovalDetail();
+    holder.firstElementChild.style.display = 'none';
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: pdfSafeFileName(model),
+      image: { type: 'jpeg', quality: 0.96 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0, x: 0, y: 0, windowWidth: 718 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css'], avoid: ['.pa-avoid'] }
+    };
+    /* 1) Each form page → canvas (html2pdf inserts "avoid" spacers so a
+          task row is never cut across two sheets).
+       2) Slice every canvas onto A4 sheets ourselves → page 2 of the form
+          always starts on a new sheet and no blank pages are produced. */
+    const canvases = [];
+    for(const el of pages){
+      canvases.push(await html2pdf().set(opt).from(el).toCanvas().get('canvas'));
+    }
+    const probe = document.createElement('div'); probe.style.cssText = 'width:10px;height:10px'; holder.appendChild(probe);
+    // html2pdf does not expose jsPDF globally: take its instance (1 probe page) and drop that page at the end.
+    const pdf = await html2pdf().set(opt).from(probe).toPdf().get('pdf');
+    const M = 10, innerW = 210 - 2*M, innerH = 297 - 2*M;
+    canvases.forEach(cv => {
+      const pxPerPage = Math.floor(cv.width * innerH / innerW);
+      for(let y = 0; y < cv.height; y += pxPerPage){
+        const sliceH = Math.min(pxPerPage, cv.height - y);
+        if(sliceH < 6) break;                         // ignore sub-pixel leftovers
+        const sc = document.createElement('canvas');
+        sc.width = cv.width; sc.height = sliceH;
+        const ctx = sc.getContext('2d');
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, sc.width, sc.height);
+        ctx.drawImage(cv, 0, y, cv.width, sliceH, 0, 0, cv.width, sliceH);
+        pdf.addPage();
+        pdf.addImage(sc.toDataURL('image/jpeg', 0.96), 'JPEG', M, M, innerW, sliceH * innerW / cv.width);
+      }
     });
-  });
-}
-function renderApprovalDetail(){
-  const a = state.activeApproval;
-  if(!a){ document.getElementById('approvalDetailContainer').innerHTML=''; return; }
-
-  let html = `<div class="section">
-    <div class="section-head"><h2>Review Detail</h2>
-      <button class="small danger" onclick="closeApproval()">Close</button>
-    </div>`;
-
-  a.kras.forEach(pair => {
-    html += `<div class="approval-detail-block">
-      <strong>${escapeHtml(pair.kra.KRA_Name||'')}</strong>
-      <div style="font-size:12px; color:var(--muted); margin-top:4px;">${escapeHtml(pair.kra.Description||'')}</div>`;
-    pair.goals.forEach(g => {
-      html += `<div class="approval-goal-row">
-        <div><label>Task</label><div class="readonly-box">${escapeHtml(g.Goal_Name||'')}</div></div>
-        <div><label>Self Rating</label><div class="readonly-box">${escapeHtml(g.Self_Rating||'—')}</div></div>
-        <div><label>Achievement</label><div class="readonly-box">${escapeHtml(g.Achievement||'—')}</div></div>
-        <div><label>Appraiser Rating</label>
-          ${a.role==='head'
-            ? `<input type="number" min="1" max="5" value="${escapeAttr(g.Appraiser_Rating||'')}" data-goal-id="${g.ID}" class="appr-rating-input">`
-            : `<div class="readonly-box">${escapeHtml(g.Appraiser_Rating||'—')}</div>`}
-        </div>
-      </div>`;
-    });
-    html += `</div>`;
-  });
-
-  if(a.competencies.length){
-    html += `<div class="approval-detail-block"><strong>Role Attributes</strong>`;
-    a.competencies.forEach(c => {
-      html += `<div class="approval-goal-row" style="grid-template-columns:2fr 1fr 1fr;">
-        <div><label>Attribute</label><div class="readonly-box">${escapeHtml(c.Attribute_Name||'')}</div></div>
-        <div><label>Self / Current Rating</label><div class="readonly-box">${escapeHtml(c.Rating||'—')}</div></div>
-        <div></div>
-      </div>`;
-    });
-    html += `</div>`;
+    pdf.deletePage(1);
+    pdf.save(opt.filename);
+    say('✅ PDF downloaded.', true);
+  } catch(err){
+    console.error('PDF ERROR', err);
+    say('Direct download failed — opening print view (choose "Save as PDF").', false);
+    pdfPrintFallback(html);
+  } finally {
+    document.body.removeChild(holder);
+    window.scrollTo(prevScroll[0], prevScroll[1]);
   }
-
-  html += `<div style="margin-top:16px; display:flex; gap:10px;">
-    <button onclick="downloadApprovalPDF()">Download PDF</button>
-    ${a.role==='head'
-      ? `<button class="solid" onclick="approveAsHead()">Approve — Send to HR</button>`
-      : `<button class="solid" onclick="approveAsHR()">Final Approve</button>`}
-  </div></div>`;
-
-  document.getElementById('approvalDetailContainer').innerHTML = html;
-}
-function closeApproval(){ state.activeApproval = null; document.getElementById('approvalDetailContainer').innerHTML=''; }
-
-function approveAsHead(){
-  const a = state.activeApproval;
-  const inputs = document.querySelectorAll('.appr-rating-input');
-  const updates = Array.from(inputs).map(inp => {
-    const goalId = inp.getAttribute('data-goal-id');
-    const val = inp.value;
-    return creatorUpdateRecord(REPORTS.goal, goalId, { Appraiser_Rating: val });
-  });
-  Promise.all(updates).then(() => {
-    return creatorUpdateRecord(REPORTS.review, a.review.ID, { Status: "Head Approved" });
-  }).then(() => {
-    setStatus('✅ Approved and sent to HR.', true);
-    closeApproval();
-    refreshApprovals();
-  }).catch(err => { console.error('APPROVE ERROR', err); setStatus('Approval failed — check console.', false); });
-}
-function approveAsHR(){
-  const a = state.activeApproval;
-  creatorUpdateRecord(REPORTS.review, a.review.ID, { Status: "Approved" }).then(() => {
-    setStatus('✅ Final approval complete.', true);
-    closeApproval();
-    refreshApprovals();
-  }).catch(err => { console.error('APPROVE ERROR', err); setStatus('Approval failed — check console.', false); });
-}
-function refreshApprovals(){ fetchPendingApprovals(); }
-
-/* ============================================================
-   SETTINGS: SECTION WEIGHTS + RATING MAP
-   ============================================================ */
-function updateSectionWeight(){
-  state.settings.kraSectionWeight = parseFloat(document.getElementById('kraSectionWeight').value) || 0;
-  state.settings.roleSectionWeight = parseFloat(document.getElementById('roleSectionWeight').value) || 0;
-  redistributeKRAWeights(); redistributeAttrWeights(); renderAll(); markUnsaved();
-}
-function renderRatingMap(){
-  const grid = document.getElementById('ratingMapGrid');
-  grid.innerHTML = [5,4,3,2,1].map(r => `
-    <div class="rating-map-row">
-      <label>Rating ${r}</label>
-      <input type="number" min="0" max="100" value="${state.settings.ratingMap[r]}" onchange="updateRatingMap(${r}, this.value)">
-    </div>`).join('');
-}
-function updateRatingMap(r, val){ state.settings.ratingMap[r] = parseFloat(val) || 0; markUnsaved(); }
-function ratingToPercent(rating){
-  const r = parseInt(rating);
-  if(!r || !state.settings.ratingMap[r]) return 0;
-  return state.settings.ratingMap[r];
 }
 
-/* ============================================================
-   AUTO-DISTRIBUTION
-   ============================================================ */
-function distributeEvenly(total, count){
-  if(count<=0) return [];
-  const each = Math.floor((total/count)*100)/100;
+
+document.querySelectorAll('.mega-logo').forEach(i => i.src = PDF_LOGO);
+
+/* ============================ STATE ============================ */
+const state = {
+  sdkReady:false, creatorUser:'', employees:[], me:null,
+  quarter:currentQuarter(), year:String(new Date().getFullYear()),
+  phase:'loading',            // loading | targets | rating | done
+  review:null,                // existing Review record (or null)
+  kras:[], attributes:[], training:[], overallRating:'',
+  texts:{ facFactors:'', conFactors:'', outAchieve:'', apprComments:'', myLearnings:'' },
+  busy:false, loadToken:0
+};
+let seq = 1;
+function nid(p){ return p + (seq++); }
+function currentQuarter(){ const m = new Date().getMonth(); return m <= 2 ? 'Q4' : m <= 5 ? 'Q1' : m <= 8 ? 'Q2' : 'Q3'; }
+
+/* ======================= CREATOR API HELPERS ======================= */
+async function getAll(reportName, criteria){
+  const out = [];
+  for(let page = 1; page <= CONFIG.MAX_PAGES; page++){
+    const cfg = { reportName, page, pageSize:CONFIG.PAGE_SIZE };
+    if(criteria) cfg.criteria = criteria;
+    let resp;
+    try{ resp = await ZOHO.CREATOR.API.getAllRecords(cfg); }
+    catch(err){ if(page === 1 && !isEmptyErr(err)) throw err; break; }
+    const rows = (resp && resp.data) ? resp.data : [];
+    out.push(...rows);
+    if(rows.length < CONFIG.PAGE_SIZE) break;
+  }
+  return out;
+}
+function isEmptyErr(err){ return /9220|No records|no data/i.test(JSON.stringify(err || '')); }
+async function getAllSafe(r, c){ try{ return await getAll(r, c); }catch(e){ console.warn('read failed', r, e); return []; } }
+function addRecord(formName, data){
+  return ZOHO.CREATOR.API.addRecord({ formName, data:{ data } }).then(resp => { if(resp && resp.code === 3000) return resp.data; throw resp; });
+}
+function updateRecord(reportName, id, data){
+  return ZOHO.CREATOR.API.updateRecord({ reportName, id, data:{ data } }).then(resp => { if(resp && resp.code === 3000) return resp.data; throw resp; });
+}
+function errText(err){
+  if(!err) return 'unknown error';
+  if(typeof err === 'string') return err;
+  if(err.message) return err.message;
+  if(err.error) return typeof err.error === 'string' ? err.error : JSON.stringify(err.error);
+  try{ return JSON.stringify(err).slice(0, 220); }catch(e){ return String(err); }
+}
+function plain(v){ if(v === null || v === undefined) return ''; if(typeof v === 'object') return v.display_value || v.zc_display_value || ''; return String(v); }
+function critStr(v){ return String(v || '').replace(/\\/g,'\\\\').replace(/"/g,'\\"'); }
+function byId(a, b){ const x = String(a.ID), y = String(b.ID); return x.length - y.length || (x < y ? -1 : x > y ? 1 : 0); }
+
+/* ======================= EMPLOYEES + LOGIN ======================= */
+function empName(rec){
+  const v = rec[CONFIG.EMP_FIELDS.name];
+  if(!v) return '';
+  if(typeof v === 'string') return v.trim();
+  if(typeof v === 'object') return (v.display_value || v.zc_display_value || [v.prefix,v.first_name,v.last_name,v.suffix].filter(Boolean).join(' ')).trim();
+  return String(v).trim();
+}
+async function loadEmployees(){
+  let lastErr = null;
+  for(const rep of CONFIG.EMPLOYEE_REPORTS){
+    try{
+      const list = (await getAll(rep)).map(r => ({
+        ID:String(r.ID), name:empName(r),
+        department:plain(r[CONFIG.EMP_FIELDS.department]).trim(),
+        email:plain(r[CONFIG.EMP_FIELDS.email]).trim().toLowerCase()
+      })).filter(e => e.name);
+      if(list.length && list.some(e => e.email)){ state.employees = list; return; }
+    }catch(err){ lastErr = err; console.warn('Employee report failed:', rep, err); }
+  }
+  throw lastErr || new Error('No employee report returned data');
+}
+function isEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+function loginMsg(msg, ok){ const el = document.getElementById('loginMsg'); el.textContent = msg || ''; el.className = 'login-msg' + (ok===true?' ok':ok===false?' bad':''); }
+async function getCreatorUser(){
+  try{ let r = ZOHO.CREATOR.UTIL.getInitParams(); if(r && typeof r.then === 'function') r = await r;
+       const u = (r && r.loginUser) ? String(r.loginUser).trim().toLowerCase() : ''; return isEmail(u) ? u : ''; }
+  catch(e){ return ''; }
+}
+function doLogin(){
+  if(!state.sdkReady){ loginMsg('Still connecting to Creator — please wait.', null); return; }
+  const mail = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
+  if(!isEmail(mail)){ loginMsg('Please enter a valid email address.', false); return; }
+  const emp = state.employees.find(e => e.email === mail);
+  if(!emp){ loginMsg('This email is not in the Mega employee list. Use your official email or contact HR.', false); return; }
+  if(CONFIG.MATCH_CREATOR_LOGIN && state.creatorUser && state.creatorUser !== mail){
+    loginMsg('This email does not match the Creator account you are signed in with (' + state.creatorUser + ').', false); return;
+  }
+  state.me = emp;
+  try{ sessionStorage.setItem('mega_pa_session', mail); }catch(e){}
+  openApp();
+}
+function logout(){ saveDraft(); try{ sessionStorage.removeItem('mega_pa_session'); }catch(e){} location.reload(); }
+
+/* ======================= PAGE + PERIOD ======================= */
+function openApp(){
+  document.getElementById('loginView').classList.add('hidden');
+  document.getElementById('appView').classList.remove('hidden');
+  document.getElementById('footerBar').classList.remove('hidden');
+  document.getElementById('whoName').textContent = state.me.name;
+  document.getElementById('whoEmail').textContent = state.me.email;
+  document.getElementById('empNameDisplay').textContent = state.me.name;
+  document.getElementById('deptDisplay').textContent = state.me.department || '—';
+  const y = new Date().getFullYear();
+  document.getElementById('yearSelect').innerHTML = [y-1, y, y+1].map(v => `<option ${String(v)===state.year?'selected':''}>${v}</option>`).join('');
+  renderQuarters();
+  loadPeriod();
+}
+function renderQuarters(){
+  document.getElementById('quarterRow').innerHTML = QUARTERS.map(q =>
+    `<div class="quarter-btn ${state.quarter===q.id?'active':''}" onclick="setQuarter('${q.id}')">${q.label}</div>`).join('');
+}
+function setQuarter(q){ if(state.busy || q === state.quarter) return; saveDraft(); state.quarter = q; renderQuarters(); loadPeriod(); }
+function changePeriod(){ if(state.busy) return; saveDraft(); state.year = document.getElementById('yearSelect').value; loadPeriod(); }
+
+/* Decides which step to show for the selected quarter / year */
+async function loadPeriod(){
+  const token = ++state.loadToken;
+  state.phase = 'loading'; resetData();
+  document.getElementById('appraiserName').value = '';
+  renderPage();
+  setStatus('Loading your ' + state.quarter + ' ' + state.year + ' appraisal…', null);
+  const me = state.me, q = state.quarter, y = state.year;
+  const [reviews, kraRecs] = await Promise.all([
+    getAllSafe(CONFIG.REPORTS.review, `(Employee_Lookup == ${me.ID} && Quarter == "${q}" && Year_field == "${y}")`),
+    getAllSafe(CONFIG.REPORTS.kra, `(Employee_Name == "${critStr(me.name)}" && Quarter == "${q}" && Year_field1 == "${y}")`)
+  ]);
+  if(token !== state.loadToken) return;                 // user switched period meanwhile
+
+  if(!reviews.length && !kraRecs.length){
+    state.phase = 'targets';
+    if(!restoreDraft()) addKRA(true);
+  } else {
+    state.review = reviews.length ? reviews.sort(byId)[0] : null;
+    const [goalLists, comps, trains] = await Promise.all([
+      Promise.all(kraRecs.sort(byId).map(k => getAllSafe(CONFIG.REPORTS.goal, `(KRA == ${k.ID})`))),
+      getAllSafe(CONFIG.REPORTS.competency, `(Employee_Name1 == "${critStr(me.name)}" && Quarter == "${q}" && Year_field1 == "${y}")`),
+      getAllSafe(CONFIG.REPORTS.training, `(Employee_Name == "${critStr(me.name)}" && Quarter1 == "${q}" && Year_field == "${y}")`)
+    ]);
+    if(token !== state.loadToken) return;
+    state.kras = kraRecs.map((k, i) => ({
+      id:nid('k'), recId:String(k.ID), name:plain(k.KRA_Name), description:plain(k.Description), weightage:parseFloat(plain(k.Weightage)) || 0,
+      goals:goalLists[i].sort(byId).map(g => ({ id:nid('g'), recId:String(g.ID), name:plain(g.Goal_Name), achievement:plain(g.Achievement),
+        weightage:parseFloat(plain(g.Weightage)) || 0, selfRating:plain(g.Self_Rating), apprRating:plain(g.Appraiser_Rating) }))
+    }));
+    state.attributes = comps.sort(byId).map(c => ({ id:nid('a'), recId:String(c.ID), name:plain(c.Attribute_Name), weightage:parseFloat(plain(c.Weightage)) || 0, rating:plain(c.Rating) }));
+    const r = state.review || {};
+    const status = plain(r.Status);
+    state.phase = (state.review && status && status !== CONFIG.STATUS.targetsSet) ? 'done' : 'rating';
+    document.getElementById('appraiserName').value = plain(r.Appraiser_Name);
+    state.texts = { facFactors:plain(r.Facilitating_Factors1), conFactors:plain(r.Constraining_Factors), outAchieve:plain(r.Outstanding_Achievement),
+                    apprComments:plain(r.Appraiser_Comments), myLearnings:plain(r.My_Learnings) };
+    state.overallRating = plain(r.Overall_Rating);
+    state.training = trains.sort(byId).map(t => ({ id:nid('t'), recId:String(t.ID), need:plain(t.Training_Need), benefit:plain(t.Expected_Benefit), fulfilled:plain(t.How_Fulfilled) }));
+    if(state.phase === 'rating') restoreDraft();
+  }
+  renderPage();
+  const msg = { targets:'Step 1 — add your Targets (KRA) and tasks, then click Submit Targets.',
+                rating:'Step 2 — fill achievement and self rating for each task, then click Submit Self Rating.',
+                done:'This appraisal is complete. You can download the PDF.' }[state.phase];
+  setStatus(msg, true);
+}
+function resetData(){
+  state.review = null; state.kras = []; state.attributes = []; state.training = []; state.overallRating = '';
+  state.texts = { facFactors:'', conFactors:'', outAchieve:'', apprComments:'', myLearnings:'' };
+}
+
+/* ======================= AUTO WEIGHTAGE ======================= */
+function splitEven(total, count){
+  if(count <= 0) return [];
+  const each = Math.floor((total / count) * 100) / 100;
   const arr = new Array(count).fill(each);
-  const assigned = each*(count-1);
-  arr[count-1] = Math.round((total-assigned)*100)/100;
+  arr[count-1] = Math.round((total - each * (count-1)) * 100) / 100;
   return arr;
 }
-function redistributeKRAWeights(){
-  const weights = distributeEvenly(state.settings.kraSectionWeight, state.kras.length);
-  state.kras.forEach((k,i)=>{ k.weightage = weights[i]; });
+function sectionShares(){ const r = state.attributes.length > 0; return { kra: r ? CONFIG.KRA_SHARE : 100, role: r ? CONFIG.ROLE_SHARE : 0 }; }
+/* Only in Step 1 — later the saved weights are used as they are */
+function applyWeights(){
+  if(state.phase !== 'targets') return;
+  const sh = sectionShares(), kw = splitEven(sh.kra, state.kras.length);
+  state.kras.forEach((k, i) => { k.weightage = kw[i]; const gw = splitEven(k.weightage, k.goals.length); k.goals.forEach((g, j) => g.weightage = gw[j]); });
+  const aw = splitEven(sh.role, state.attributes.length);
+  state.attributes.forEach((a, i) => a.weightage = aw[i]);
 }
-function redistributeAttrWeights(){
-  const weights = distributeEvenly(state.settings.roleSectionWeight, state.attributes.length);
-  state.attributes.forEach((a,i)=>{ a.weightage = weights[i]; });
+function pct(r){ const n = parseInt(r, 10); return CONFIG.RATING_PCT[n] !== undefined ? CONFIG.RATING_PCT[n] : 0; }
+function computeScores(){
+  let kra = 0, role = 0;
+  state.kras.forEach(k => k.goals.forEach(g => { kra += (g.weightage || 0) * pct(g.selfRating) / 100; }));
+  state.attributes.forEach(a => { role += (a.weightage || 0) * pct(a.rating) / 100; });
+  kra = Math.round(kra*100)/100; role = Math.round(role*100)/100;
+  return { kra, role, total: Math.round((kra + role)*100)/100 };
+}
+function suggestedOverall(s){ return s >= 96 ? 'Outstanding' : s >= 86 ? 'Exceeds Expectations' : s >= 71 ? 'Meets Expectations' : s >= 50 ? 'Needs Improvement' : 'Unacceptable'; }
+function kraTotal(){ return state.kras.reduce((s,k) => s + (k.weightage||0), 0); }
+function roleTotal(){ return state.attributes.reduce((s,a) => s + (a.weightage||0), 0); }
+
+/* ======================= STEP 1 EDITING ======================= */
+function newGoal(){ return { id:nid('g'), recId:'', name:'', achievement:'', weightage:0, selfRating:'', apprRating:'' }; }
+function addKRA(silent){ state.kras.push({ id:nid('k'), recId:'', name:'', description:'', weightage:0, goals:[newGoal()] }); if(!silent){ renderPage(); markUnsaved(); } }
+function removeKRA(id){ state.kras = state.kras.filter(k => k.id !== id); renderPage(); markUnsaved(); }
+function findKra(id){ return state.kras.find(k => k.id === id); }
+function findGoal(kid, gid){ return findKra(kid).goals.find(g => g.id === gid); }
+function addGoal(kid){ findKra(kid).goals.push(newGoal()); renderPage(); markUnsaved(); }
+function removeGoal(kid, gid){ const k = findKra(kid); k.goals = k.goals.filter(g => g.id !== gid); renderPage(); markUnsaved(); }
+function addAttribute(){ state.attributes.push({ id:nid('a'), recId:'', name:'', weightage:0, rating:'' }); renderPage(); markUnsaved(); }
+function removeAttribute(id){ state.attributes = state.attributes.filter(a => a.id !== id); renderPage(); markUnsaved(); }
+/* text edits never re-render (keeps the cursor where the user clicked) */
+function setKra(id, f, v){ findKra(id)[f] = v; markUnsaved(); }
+function setGoal(kid, gid, f, v){ findGoal(kid, gid)[f] = v; if(f === 'selfRating') renderScores(); markUnsaved(); }
+function setAttr(id, f, v){ state.attributes.find(a => a.id === id)[f] = v; if(f === 'rating') renderScores(); markUnsaved(); }
+function setText(id, v){ state.texts[id] = v; markUnsaved(); }
+
+/* ======================= STEP 2 EXTRAS ======================= */
+function addTrainingRow(){ state.training.push({ id:nid('t'), recId:'', need:'', benefit:'', fulfilled:'' }); renderPage(); markUnsaved(); }
+function removeTrainingRow(id){ state.training = state.training.filter(t => t.id !== id); renderPage(); markUnsaved(); }
+function setTrain(id, f, v){ state.training.find(t => t.id === id)[f] = v; markUnsaved(); }
+function setOverall(l){ state.overallRating = l; renderOverall(); markUnsaved(); }
+
+/* ======================= RENDER ======================= */
+function ratingSelect(value, onchange){
+  return `<select onchange="${onchange}"><option value="">— Rate —</option>${[5,4,3,2,1].map(r =>
+    `<option value="${r}" ${String(value)===String(r)?'selected':''}>${RATING_LABELS[r]}</option>`).join('')}</select>`;
+}
+function renderBanner(){
+  const p = state.phase, el = document.getElementById('stepBanner');
+  if(p === 'loading'){ el.innerHTML = ''; return; }
+  const info = {
+    targets:['STEP 1','Set your Targets','Add each Target (KRA) and the tasks under it. Weightage is calculated automatically. Ratings are given later in Step 2.',''],
+    rating:['STEP 2','Self Rating','Your targets are saved. Fill the achievement and your self rating for every task, then submit.','rating'],
+    done:['DONE','Appraisal submitted','Status: ' + (plain(state.review && state.review.Status) || 'Submitted') + '. Your entries are locked — download the PDF anytime.','done']
+  }[p];
+  el.innerHTML = `<div class="step-banner ${info[3]}"><span class="num">${info[0]}</span><div><div class="t">${info[1]}</div><div class="d">${info[2]}</div></div>
+    <div class="steps"><span class="${p==='targets'?'on':''}">1 · Targets</span><span class="${p==='rating'?'on':''}">2 · Self Rating</span><span class="${p==='done'?'on':''}">✓ Done</span></div></div>`;
+  const btn = document.getElementById('mainBtn');
+  btn.classList.toggle('hidden', p === 'done');
+  btn.textContent = p === 'targets' ? 'Submit Targets' : 'Submit Self Rating';
+  btn.disabled = state.busy;
+  document.getElementById('appraiserName').disabled = p === 'done';
+}
+function renderPage(){
+  applyWeights();
+  renderBanner();
+  const body = document.getElementById('pageBody');
+  if(state.phase === 'loading'){ body.innerHTML = '<div class="section"><div class="loading-box">Loading…</div></div>'; return; }
+  if(state.phase === 'targets') body.innerHTML = targetsHtml();
+  else body.innerHTML = ratingHtml(state.phase === 'done');
+  renderScores(); renderOverall();
 }
 
-/* ============================================================
-   KRA + GOALS
-   ============================================================ */
-function addKRA(){
-  state.kras.push({id:'k'+(kraSeq++), name:'', description:'', weightage:0, goals:[]});
-  redistributeKRAWeights(); renderAll(); markUnsaved();
-}
-function removeKRA(id){
-  state.kras = state.kras.filter(k=>k.id!==id);
-  redistributeKRAWeights(); renderAll(); markUnsaved();
-}
-function addGoal(kraId){
-  const kra = state.kras.find(k=>k.id===kraId);
-  kra.goals.push({id:'g'+(goalSeq++), name:'', weightage:'', achievement:'', selfRating:'', apprRating:''});
-  renderAll(); markUnsaved();
-}
-function removeGoal(kraId, goalId){
-  const kra = state.kras.find(k=>k.id===kraId);
-  kra.goals = kra.goals.filter(g=>g.id!==goalId);
-  renderAll(); markUnsaved();
-}
-function updateKRAField(id, field, value){ state.kras.find(k=>k.id===id)[field]=value; renderAll(); markUnsaved(); }
-function updateGoalField(kraId, goalId, field, value){
-  const kra = state.kras.find(k=>k.id===kraId);
-  kra.goals.find(g=>g.id===goalId)[field]=value;
-  renderAll(); markUnsaved();
-}
-
-function kraWeightSum(){ return state.kras.reduce((s,k)=>s+(parseFloat(k.weightage)||0),0); }
-function goalWeightSum(kra){ return kra.goals.reduce((s,g)=>s+(parseFloat(g.weightage)||0),0); }
-function attrWeightSum(){ return state.attributes.reduce((s,a)=>s+(parseFloat(a.weightage)||0),0); }
-
-function renderKRAs(){
-  const el = document.getElementById('kraList');
-  if(state.kras.length===0){
-    el.innerHTML = `<div style="color:var(--muted); font-size:13px;">No targets added yet.</div>`;
-  } else {
-    el.innerHTML = state.kras.map((kra, idx) => {
-      const gSum = goalWeightSum(kra);
-      const kraW = parseFloat(kra.weightage)||0;
-      const goalStatus = gSum > kraW ? 'bad' : 'ok';
-      return `
+/* ---------- STEP 1 page ---------- */
+function targetsHtml(){
+  const sh = sectionShares();
+  return `
+  <div class="section">
+    <div class="section-head"><h2>Targets (KRA) &amp; Tasks</h2><span class="weight-badge">${fmt(sh.kra)}% · ${state.kras.length} target(s)</span></div>
+    <div class="note">Weightage is automatic: ${fmt(sh.kra)}% is split equally between Targets, and each Target's share is split equally between its tasks.</div>
+    ${state.kras.length ? state.kras.map((k, i) => `
       <div class="kra-block">
         <div class="kra-top">
           <div class="fields">
-            <div><label>Target ${idx+1} Name</label>
-              <input value="${escapeAttr(kra.name)}" placeholder="e.g. Code Optimization" onchange="updateKRAField('${kra.id}','name',this.value)"></div>
-            <div><label>Description</label>
-              <input value="${escapeAttr(kra.description)}" placeholder="What this target covers" onchange="updateKRAField('${kra.id}','description',this.value)"></div>
-            <div><label>Weightage (auto)</label>
-              <input type="text" value="${kraW.toFixed(2)}%" disabled></div>
+            <div><label>Target ${i+1} <span class="req">*</span></label><input value="${esc(k.name)}" placeholder="e.g. Zoho Creator Development" onchange="setKra('${k.id}','name',this.value)"></div>
+            <div><label>Description</label><input value="${esc(k.description)}" placeholder="What this target covers" onchange="setKra('${k.id}','description',this.value)"></div>
+            <div><label>Weightage (auto)</label><input value="${fmt(k.weightage)}%" disabled></div>
           </div>
-          <div class="kra-actions"><button class="small danger" onclick="removeKRA('${kra.id}')">Remove</button></div>
+          <div class="kra-actions"><button class="small danger" onclick="removeKRA('${k.id}')">Remove</button></div>
         </div>
-
-        ${kra.goals.map((g, gi) => `
+        ${k.goals.map((g, j) => `
           <div class="goal-row">
-            <div class="goal-row-header">
-              <span class="goal-tag">TASK ${gi+1}</span>
-              <button class="small danger" onclick="removeGoal('${kra.id}','${g.id}')">Remove</button>
-            </div>
-            <div><label>Task / Goal Description</label>
-              <textarea placeholder="Describe the task" onchange="updateGoalField('${kra.id}','${g.id}','name',this.value)">${escapeHtml(g.name)}</textarea></div>
-            <div class="achievement-grid">
-              <div><label>Achievement</label>
-                <textarea placeholder="What was achieved" onchange="updateGoalField('${kra.id}','${g.id}','achievement',this.value)">${escapeHtml(g.achievement)}</textarea></div>
-              <div><label>Weightage (%)</label>
-                <input type="number" min="0" max="100" value="${escapeAttr(g.weightage)}" onchange="updateGoalField('${kra.id}','${g.id}','weightage',this.value)"></div>
-              <div><label>Self Rating (1–5)</label>
-                <input type="number" min="1" max="5" value="${escapeAttr(g.selfRating)}" onchange="updateGoalField('${kra.id}','${g.id}','selfRating',this.value)"></div>
-              <div><label>Appraiser Rating (1–5)</label>
-                <input type="number" min="1" max="5" value="${escapeAttr(g.apprRating)}" disabled placeholder="Set by Dept Head"></div>
-            </div>
-          </div>
-        `).join('')}
-
-        <div class="kra-goal-total" style="color:${goalStatus==='bad'?'var(--red)':'var(--muted)'};">
-          Goal weightage assigned: ${gSum.toFixed(1)}% / ${kraW.toFixed(1)}% ${goalStatus==='bad' ? '❌ exceeds KRA weight' : ''}
-        </div>
-        <div style="margin-top:10px;"><button class="small" onclick="addGoal('${kra.id}')">+ Add Task under this Target</button></div>
-      </div>`;
-    }).join('');
-  }
-
-  const kSum = kraWeightSum();
-  const kAllowed = state.settings.kraSectionWeight;
-  const badge = document.getElementById('kraSectionBadge');
-  badge.textContent = `${kSum.toFixed(1)} / ${kAllowed.toFixed(1)} assigned`;
-  badge.className = 'weight-badge ' + (Math.abs(kSum-kAllowed)<0.01 ? 'ok' : (kSum>kAllowed ? 'bad' : ''));
-}
-
-/* ============================================================
-   ROLE ATTRIBUTES
-   ============================================================ */
-function addAttribute(){
-  state.attributes.push({id:'a'+(attrSeq++), name:'', weightage:0, rating:''});
-  redistributeAttrWeights(); renderAll(); markUnsaved();
-}
-function removeAttribute(id){
-  state.attributes = state.attributes.filter(a=>a.id!==id);
-  redistributeAttrWeights(); renderAll(); markUnsaved();
-}
-function updateAttrField(id, field, value){ state.attributes.find(a=>a.id===id)[field]=value; markUnsaved(); }
-
-function renderAttributes(){
-  const el = document.getElementById('attrList');
-  if(state.attributes.length===0){
-    el.innerHTML = `<div style="color:var(--muted); font-size:13px;">No role attributes added yet.</div>`;
-  } else {
-    el.innerHTML = state.attributes.map((a,i) => `
-      <div class="attr-row">
-        <div><label>Attribute ${i+1}</label>
-          <input value="${escapeAttr(a.name)}" placeholder="e.g. Leadership Potential" onchange="updateAttrField('${a.id}','name',this.value)"></div>
-        <div><label>Weightage (auto)</label>
-          <input type="text" value="${(parseFloat(a.weightage)||0).toFixed(2)}%" disabled></div>
-        <div><label>Rating (1–5)</label>
-          <input type="number" min="1" max="5" value="${escapeAttr(a.rating)}" onchange="updateAttrField('${a.id}','rating',this.value)"></div>
+            <div class="goal-row-header"><span class="goal-tag">TASK ${i+1}.${j+1} · ${fmt(g.weightage)}%</span><button class="small danger" onclick="removeGoal('${k.id}','${g.id}')">Remove</button></div>
+            <div><label>Task <span class="req">*</span></label><textarea placeholder="Describe the task" onchange="setGoal('${k.id}','${g.id}','name',this.value)">${esc(g.name)}</textarea></div>
+          </div>`).join('')}
+        <div style="margin-top:12px;"><button class="small" onclick="addGoal('${k.id}')">+ Add Task under Target ${i+1}</button></div>
+      </div>`).join('') : '<div class="empty">No targets yet.</div>'}
+    <div style="margin-top:14px;"><button class="solid" onclick="addKRA()">+ Add Target (KRA)</button></div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>Role Attributes</h2><span class="weight-badge">${fmt(sh.role)}% · ${state.attributes.length} attribute(s)</span></div>
+    <div class="note">Optional. If you add role attributes they share 20% and Targets get 80%. You will rate them in Step 2.</div>
+    ${state.attributes.length ? state.attributes.map((a, i) => `
+      <div class="attr-row" style="grid-template-columns:3fr 1fr auto;">
+        <div><label>Attribute ${i+1} <span class="req">*</span></label><input value="${esc(a.name)}" placeholder="e.g. Leadership" onchange="setAttr('${a.id}','name',this.value)"></div>
+        <div><label>Weightage (auto)</label><input value="${fmt(a.weightage)}%" disabled></div>
         <div><button class="small danger" onclick="removeAttribute('${a.id}')">✕</button></div>
-      </div>`).join('');
-  }
-  const aSum = attrWeightSum();
-  const aAllowed = state.settings.roleSectionWeight;
-  const badge = document.getElementById('attrSectionBadge');
-  badge.textContent = `${aSum.toFixed(1)} / ${aAllowed.toFixed(1)} assigned`;
-  badge.className = 'weight-badge ' + (Math.abs(aSum-aAllowed)<0.01 ? 'ok' : (aSum>aAllowed ? 'bad' : ''));
-}
-
-/* ============================================================
-   TRAINING NEEDS
-   ============================================================ */
-function addTrainingRow(){ state.training.push({id:'t'+(trainSeq++), need:'', benefit:'', fulfilled:''}); renderTraining(); markUnsaved(); }
-function removeTrainingRow(id){ state.training = state.training.filter(t=>t.id!==id); renderTraining(); markUnsaved(); }
-function updateTrainingField(id, field, value){ state.training.find(t=>t.id===id)[field]=value; markUnsaved(); }
-function renderTraining(){
-  const el = document.getElementById('trainBody');
-  if(state.training.length===0){ el.innerHTML = `<tr><td colspan="4" style="color:var(--muted); font-size:12px;">No training needs added yet.</td></tr>`; return; }
-  el.innerHTML = state.training.map(t => `
-    <tr>
-      <td><input value="${escapeAttr(t.need)}" onchange="updateTrainingField('${t.id}','need',this.value)"></td>
-      <td><input value="${escapeAttr(t.benefit)}" onchange="updateTrainingField('${t.id}','benefit',this.value)"></td>
-      <td><input value="${escapeAttr(t.fulfilled)}" placeholder="Internal / Self-study / Outside" onchange="updateTrainingField('${t.id}','fulfilled',this.value)"></td>
-      <td><button class="small danger" onclick="removeTrainingRow('${t.id}')">✕</button></td>
-    </tr>`).join('');
-}
-
-/* ============================================================
-   OVERALL RATING
-   ============================================================ */
-const overallLabels = ['Outstanding','Exceeds Expectations','Meets Expectations','Needs Improvement','Unacceptable'];
-function renderOverall(){
-  document.getElementById('overallOptions').innerHTML = overallLabels.map(l => `
-    <div class="overall-opt ${state.overallRating===l?'selected':''}" onclick="setOverall('${l}')">${l}</div>`).join('');
-}
-function setOverall(l){ state.overallRating=l; renderOverall(); markUnsaved(); }
-
-/* ============================================================
-   SCORE CALCULATION
-   ============================================================ */
-function computeScores(){
-  let kraContribution = 0;
-  for(const kra of state.kras){
-    const kraW = parseFloat(kra.weightage)||0;
-    if(kra.goals.length===0 || kraW===0) continue;
-    let weightedSum=0, weightTotal=0;
-    for(const g of kra.goals){
-      const gw = parseFloat(g.weightage)||0;
-      const rating = g.apprRating || g.selfRating;
-      const pct = ratingToPercent(rating);
-      weightedSum += gw*pct; weightTotal += gw;
-    }
-    const effectivePct = weightTotal>0 ? (weightedSum/weightTotal) : 0;
-    kraContribution += kraW * (effectivePct/100);
-  }
-  let attrContribution = 0;
-  for(const a of state.attributes){
-    const aw = parseFloat(a.weightage)||0;
-    const pct = ratingToPercent(a.rating);
-    attrContribution += aw * (pct/100);
-  }
-  return {kraContribution, attrContribution, overall:kraContribution+attrContribution};
-}
-
-/* ============================================================
-   RENDER ALL
-   ============================================================ */
-function renderAll(){
-  renderKRAs();
-  renderAttributes();
-  const total = state.settings.kraSectionWeight + state.settings.roleSectionWeight;
-  const splitBadge = document.getElementById('overallSplitBadge');
-  splitBadge.textContent = `${state.settings.kraSectionWeight} + ${state.settings.roleSectionWeight} = ${total}%`;
-  splitBadge.className = 'weight-badge ' + (total===100 ? 'ok' : 'bad');
-  document.getElementById('totalSectionWeight').value = total;
-}
-
-/* ============================================================
-   SAVE / EXPORT (Creator Widget SDK)
-   ============================================================ */
-function markUnsaved(){ setStatus('Unsaved changes — click Save Appraisal to persist.', null); }
-function setStatus(msg, ok){
-  const s = document.getElementById('statusText');
-  s.textContent = msg; s.classList.remove('ok','bad');
-  if(ok===true) s.classList.add('ok');
-  if(ok===false) s.classList.add('bad');
-}
-function creatorAddRecord(formName, data){
-  return new Promise((resolve, reject) => {
-    const config = { formName: formName, data: { "data": data } };
-    ZOHO.CREATOR.API.addRecord(config).then(resp => {
-      if(resp && resp.code === 3000){ resolve(resp.data); } else { reject(resp); }
-    }).catch(reject);
-  });
-}
-function creatorUpdateRecord(reportName, id, data){
-  return new Promise((resolve, reject) => {
-    const config = { reportName: reportName, id: id, data: { "data": data } };
-    ZOHO.CREATOR.API.updateRecord(config).then(resp => {
-      if(resp && resp.code === 3000){ resolve(resp.data); } else { reject(resp); }
-    }).catch(reject);
-  });
-}
-
-/* Snapshot of the form used for the PDF (deep copy, so later edits don't change it) */
-function snapshotForPDF(){
-  const emp = state.employees.find(e => String(e.ID) === String(document.getElementById('empSelect').value));
-  const sc = computeScores();
-  return JSON.parse(JSON.stringify({
-    employee: emp ? emp.name : '',
-    appraiser: document.getElementById('appraiserName').value,
-    department: emp ? emp.department : '',
-    quarter: state.quarter,
-    year: document.getElementById('yearInput').value,
-    status: document.getElementById('statusSelect').value,
-    overall: state.overallRating || '',
-    kras: state.kras,
-    attributes: state.attributes,
-    facilitating: document.getElementById('facFactors').value,
-    constraining: document.getElementById('conFactors').value,
-    outstanding: document.getElementById('outAchieve').value,
-    comments: document.getElementById('apprComments').value,
-    learnings: document.getElementById('myLearnings').value,
-    training: state.training,
-    scores: { kra: sc.kraContribution, attr: sc.attrContribution, final: sc.overall },
-    kraSectionWeight: state.settings.kraSectionWeight,
-    roleSectionWeight: state.settings.roleSectionWeight
-  }));
-}
-
-async function saveAll(){
-  const kSum = kraWeightSum(), kAllowed = state.settings.kraSectionWeight;
-  const aSum = attrWeightSum(), aAllowed = state.settings.roleSectionWeight;
-  const total = state.settings.kraSectionWeight + state.settings.roleSectionWeight;
-
-  if(total !== 100){ setStatus('❌ KRA + Role Attribute section weight must total 100%. Fix before saving.', false); return; }
-  for(const kra of state.kras){
-    const gSum = goalWeightSum(kra);
-    if(gSum > (parseFloat(kra.weightage)||0) + 0.01){
-      setStatus(`❌ Goals under "${kra.name||'(unnamed KRA)'}" exceed that KRA's auto-weightage. Fix before saving.`, false);
-      return;
-    }
-  }
-
-  const empId = document.getElementById('empSelect').value;
-  const deptHeadId = document.getElementById('deptHeadSelect').value;
-  const hrApproverId = document.getElementById('hrApproverSelect').value;
-  const statusVal = document.getElementById('statusSelect').value;
-  const emp = state.employees.find(e => String(e.ID) === String(empId));
-
-  if(!empId){ setStatus('❌ Please select an Employee before saving.', false); return; }
-  if(statusVal === 'Submitted for Approval' && !deptHeadId){ setStatus('❌ Please select a Department Head before submitting for approval.', false); return; }
-  if(statusVal === 'Submitted for Approval' && !hrApproverId){ setStatus('❌ Please select an HR Approver before submitting for approval.', false); return; }
-
-  setStatus('Saving…', null);
-  document.getElementById('saveBtn').disabled = true;
-  try{
-    const employee = emp ? emp.name : '';
-    const appraiser = document.getElementById('appraiserName').value;
-    const department = emp ? emp.department : '';
-    const year = document.getElementById('yearInput').value;
-    const quarter = state.quarter;
-
-    for(const kra of state.kras){
-      if(!kra.name) continue;
-      const kraRecord = await creatorAddRecord("KRA", {
-        KRA_Name: kra.name, Description: kra.description||'', Employee_Name: employee,
-        Quarter: quarter, Year_field1: year, Weightage: kra.weightage
-      });
-      const kraId = kraRecord.ID;
-      for(const goal of kra.goals){
-        if(!goal.name) continue;
-        await creatorAddRecord("Goal", {
-          Goal_Name: goal.name, Description: goal.name, KRA: kraId, Weightage: goal.weightage||'',
-          Achievement: goal.achievement||'', Self_Rating: goal.selfRating||'', Appraiser_Rating: '',
-          Data_Source: "Manual"
-        });
-      }
-    }
-    for(const attr of state.attributes){
-      if(!attr.name) continue;
-      await creatorAddRecord("Competency", {
-        Attribute_Name: attr.name, Weightage: attr.weightage, Rating: attr.rating||'',
-        Employee_Name1: employee, Quarter: quarter, Year_field1: year
-      });
-    }
-    const scores = computeScores();
-
-    console.log("Scores :", scores);
-    console.log("KRA :", scores.kraContribution);
-    console.log("Competency :", scores.attrContribution);
-    console.log("Final :", scores.overall);
-    console.log("Type :", typeof scores.overall);
-
-    await creatorAddRecord("Review", {
-      Employee_Lookup: empId,
-      Department_Head: deptHeadId || '',
-      HR_Approver: hrApproverId || '',
-      Status: statusVal,
-      Appraiser_Name: appraiser, Department: department, Quarter: quarter, Year_field: year,
-      Facilitating_Factors1: document.getElementById('facFactors').value,
-      Constraining_Factors: document.getElementById('conFactors').value,
-      Outstanding_Achievement: document.getElementById('outAchieve').value,
-      Appraiser_Comments: document.getElementById('apprComments').value,
-      My_Learnings: document.getElementById('myLearnings').value,
-      Overall_Rating: state.overallRating || '',
-      KRA_Score: parseFloat(scores.kraContribution.toFixed(2)) || 0,
-      Competency_Score: parseFloat(scores.attrContribution.toFixed(2)) || 0,
-      Final_Score: Number(scores.overall)
-    });
-    for(const t of state.training){
-      if(!t.need) continue;
-      await creatorAddRecord("Training_Need", {
-        Training_Need: t.need, Expected_Benefit: t.benefit||'', How_Fulfilled: t.fulfilled||'',
-        Employee_Name: employee, Quarter1: quarter, Year_field: year
-      });
-    }
-
-    /* ---- saved OK: keep a snapshot and reveal the Download PDF button ---- */
-    lastSavedPDF = snapshotForPDF();
-    document.getElementById('dlPdfBtn').style.display = '';
- //   setStatus((statusVal==='Submitted for Approval' ? '✅ Submitted for approval.' : '✅ Saved as draft.') + ' You can now download the PDF →', true);
-        setStatus(statusVal==='Submitted for Approval' ? '✅ Submitted for approval. Preparing PDF…' : '✅ Saved as draft. Preparing PDF…', true);
-    await generatePDF(lastSavedPDF);
-  } catch(err){
-    console.error('SAVE ERROR', err);
-    if(err && err.responseText){ console.error('SAVE RESPONSE:', err.responseText); }
-    setStatus('Save failed — check console for details.', false);
-  } finally {
-    document.getElementById('saveBtn').disabled = false;
-  }
-}
-function buildPayload(){
-  return {
-    quarter: state.quarter, settings: state.settings, kras: state.kras, attributes: state.attributes,
-    facilitatingFactors: document.getElementById('facFactors').value,
-    constrainingFactors: document.getElementById('conFactors').value,
-    outstandingAchievement: document.getElementById('outAchieve').value,
-    appraiserComments: document.getElementById('apprComments').value,
-    myLearnings: document.getElementById('myLearnings').value,
-    training: state.training, overallRating: state.overallRating, computedScores: computeScores()
-  };
-}
-function exportJSON(){
-  const data = JSON.stringify(buildPayload(), null, 2);
-  const blob = new Blob([data], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='appraisal_export.json'; a.click();
-  URL.revokeObjectURL(url);
-}
-
-/* ============================================================
-   PDF EXPORT — same layout as Performance_Appraisal_Form (Word template)
-   ============================================================ */
-const MEGA_LOGO = 'data:image/png;base64,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';
-
-const DEV_DIGITS = ['०','१','२','३','४','५','६','७','८','९'];
-const devNum = n => String(n).split('').map(c => /\d/.test(c) ? DEV_DIGITS[+c] : c).join('');
-const nl = s => escapeHtml(s === undefined || s === null ? '' : s).replace(/\n/g, '<br>');
-const fx = v => (v === undefined || v === null || v === '' || isNaN(parseFloat(v))) ? '' : parseFloat(v).toFixed(2);
-
-function buildAppraisalHTML(d){
-  const kraW  = d.kras.reduce((s,k)=>s+(parseFloat(k.weightage)||0),0) || d.kraSectionWeight || state.settings.kraSectionWeight;
-  const roleW = d.attributes.reduce((s,a)=>s+(parseFloat(a.weightage)||0),0) || d.roleSectionWeight || state.settings.roleSectionWeight;
-  const Q = [['Q1','Q1: April to June'],['Q2','Q2 : July to September'],['Q3','Q3 :October- December'],['Q4','Q4: January to March']];
-  const logo = `<img src="${MEGA_LOGO}" style="height:15mm;display:block;">`;
-
-  /* ---------- Targets ---------- */
-  let targetRows = '';
-  const n = Math.max(d.kras.length, 6);
-  for(let i=0;i<n;i++){
-    const k = d.kras[i];
-    const label = i < 5 ? `Target-${i+1} (उद्दिष्ट ${devNum(i+1)}) :`
-                : i === 5 ? `Additional Target ( If any) : (उद्दिष्ट ${devNum(i+1)}):`
-                : `Additional Target (उद्दिष्ट ${devNum(i+1)}):`;
-    if(!k){
-      targetRows += `<tr class="avoid"><td><b>${label}</b><div style="height:9mm"></div><b>Achievement: (प्राप्ति ${devNum(i+1)})</b><div style="height:3mm"></div></td><td></td><td></td></tr>`;
-      continue;
-    }
-    targetRows += `<tr class="avoid"><td><b>${label}</b> ${nl(k.name)}
-        <span class="wt">&nbsp;[Weightage: ${(parseFloat(k.weightage)||0).toFixed(2)}%]</span>
-        ${k.description ? `<div class="desc">${nl(k.description)}</div>` : ''}</td><td></td><td></td></tr>`;
-    if(!k.goals.length){
-      targetRows += `<tr class="avoid"><td><b>Achievement: (प्राप्ति ${devNum(i+1)})</b><div style="height:8mm"></div></td><td></td><td></td></tr>`;
-    }
-    k.goals.forEach((g, gi) => {
-      targetRows += `<tr class="avoid">
-        <td class="task">
-          <div><b>Task ${gi+1}:</b> ${nl(g.name)} ${g.weightage ? `<span class="wt">[Wt ${nl(g.weightage)}%]</span>` : ''}</div>
-          <div style="margin-top:1.5mm"><b>Achievement: (प्राप्ति ${devNum(i+1)}.${devNum(gi+1)})</b> ${nl(g.achievement)}</div>
-        </td>
-        <td class="c">${nl(g.selfRating)}</td><td class="c">${nl(g.apprRating)}</td></tr>`;
-    });
-  }
-
-  /* ---------- Role attributes ---------- */
-  let attrRows = '';
-  const an = Math.max(d.attributes.length, 5);
-  for(let i=0;i<an;i++){
-    const a = d.attributes[i];
-    attrRows += `<tr class="avoid"><td class="c" style="width:9%"><b>${i+1}</b></td><td>${a ? nl(a.name) : ''}${a && a.weightage ? ` <span class="wt">[Wt ${(parseFloat(a.weightage)||0).toFixed(2)}%]</span>` : ''}</td><td class="c" style="width:14%">${a ? nl(a.rating) : ''}</td></tr>`;
-  }
-
-  /* ---------- Training ---------- */
-  const trainRows = (d.training.length ? d.training : [{}]).map(t =>
-    `<tr class="avoid"><td style="height:8mm">${nl(t.need)}</td><td>${nl(t.benefit)}</td><td>${nl(t.fulfilled)}</td></tr>`).join('');
-
-  /* ---------- Overall rating ---------- */
-  const box = label => `<span class="cb ${d.overall===label?'on':''}"></span><b>${label}</b>`;
-
-  return `
-  <style>
-    .pa{font-family:'Noto Sans','Noto Sans Devanagari',Arial,sans-serif; font-size:10.5px; color:#000; line-height:1.4; width:190mm; background:#fff;}
-    .pa table{width:100%; border-collapse:collapse; table-layout:fixed;}
-    .pa td,.pa th{border:1px solid #000; padding:1.6mm 2mm; vertical-align:top; text-align:left; word-wrap:break-word;}
-    .pa th{font-weight:700;}
-    .pa .c{text-align:center; vertical-align:middle;}
-    .pa .desc{font-size:9px; font-style:italic; color:#333; margin-top:1mm;}
-    .pa .wt{font-size:9px; color:#444;}
-    .pa .task{padding-left:5mm;}
-    .pa .title{font-size:14px; font-weight:700; text-align:center;}
-    .pa .qt td{font-style:italic; padding:1.2mm 2mm;}
-    .pa .qt td.qa{font-weight:700; font-style:normal; background:#e6e6e6;}
-    .pa .small{font-size:9.5px; font-weight:700;}
-    .pa .box td{padding:2mm 2.5mm;}
-    .pa .cb{display:inline-block; width:3.2mm; height:3.2mm; border:1px solid #000; margin-right:1.5mm; vertical-align:middle;}
-    .pa .cb.on{background:#000;}
-    .pa .pb{page-break-before:always; height:0;}
-    .pa .sig{font-weight:700; margin-top:5mm;}
-  </style>
-  <div class="pa">
-    <!-- ===== PAGE 1 ===== -->
-    <div style="display:flex; align-items:center;">
-      <div style="width:45mm">${logo}</div>
-      <div class="title" style="flex:1; padding-right:45mm;">Performance Appraisal Form</div>
-    </div>
-    <table class="qt" style="margin-top:3mm; width:150mm;"><tr>
-      ${Q.map(([id,l]) => `<td class="${d.quarter===id?'qa':''}">${l}</td>`).join('')}
-    </tr></table>
-
-    <div style="display:flex; justify-content:space-between; margin-top:5mm; font-size:11.5px; font-weight:700;">
-      <div>Name: ${nl(d.employee).toUpperCase()}</div>
-      <div style="width:70mm">Department: ${nl(d.department).toUpperCase()}</div>
-    </div>
-    <div style="display:flex; justify-content:space-between; margin-top:2mm; font-size:11.5px; font-weight:700;">
-      <div>Name of Appraiser:&nbsp; ${nl(d.appraiser)}</div>
-      <div style="width:70mm">Year: ${nl(d.year)}</div>
-    </div>
-
-    <div class="small" style="margin:4mm 0 1.5mm;">Five Targets are must. Rating : 5 = Outstanding ( 96% and above), 4=Very Good ( 86%-95%) 3 = Good ( 71-85%) 2= Fair ( 50-70%) 1= Poor ( below 50%) &nbsp;&nbsp;&nbsp; Target Achievement: ${Math.round(kraW)}% Weightage</div>
-
-    <table>
-      <colgroup><col style="width:77%"><col style="width:11.5%"><col style="width:11.5%"></colgroup>
-      <tr>
-        <th>Performance Parameter, Targets and Achievements<div style="font-size:8.5px; font-style:italic; font-weight:400;">Targets to be linked to Company Goal/Departmental Goal/Cross Functional Team/ System Development/ Self Development/ People Development</div></th>
-        <th class="c">Self Rating</th><th class="c">Appraiser's rating</th>
-      </tr>
-      ${targetRows}
-      <tr class="avoid"><td colspan="3" class="c"><b>Total</b> &nbsp;&nbsp; ${fx(d.scores.kra)} ${fx(d.scores.kra) ? '/ ' + Math.round(kraW) : ''}</td></tr>
-      <tr class="avoid"><td colspan="3" style="height:20mm"><b>Appraiser's / HOD's Remark:</b></td></tr>
-    </table>
-    <div class="small" style="font-size:8.5px; margin-top:1.5mm;">Signature of appraise is to confirm that feedback is given to him and rating given by appraiser is jointly agreed between Appraisee and Appraiser</div>
-    <div class="sig" style="margin-top:8mm;">Signature Appraisee…………………………..Sign. Appraiser…………………………Sign. HOD</div>
-
-    <!-- ===== PAGE 2 ===== -->
-    <div class="pb"></div>
-    <div style="margin-bottom:3mm;">${logo}</div>
-    <table class="box">
-      <tr><td style="height:24mm"><b>Facilitating Factors</b>: उद्दिष्ट सुलभ करणारे घटक <i>(Appraisee to write which were the factors that helped to achieve the targets. Please give reference to specific target number)</i><div style="margin-top:1.5mm">${nl(d.facilitating)}</div></td></tr>
-      <tr><td style="height:24mm"><b>Constraining Factors</b>: उद्दिष्ट साध्य करण्यासाठी आलेले अडथळे <i>(Appraisee to write the factors which were constraints to achieve the targets. Please give reference to specific target number)</i><div style="margin-top:1.5mm">${nl(d.constraining)}</div></td></tr>
-      <tr><td style="height:24mm"><b>Outstanding Achievement/ Significant Contribution</b>: उल्लेखनीय कामगिरी/ योगदान <i>( Mention quantified benefits to company)</i> कंपनीला झालेला फायदा<div style="margin-top:1.5mm">${nl(d.outstanding)}</div></td></tr>
-      <tr><td style="height:24mm"><b>Comments of Appraiser</b>: <i>(How facilitating factors will be reinforced and constraining factors will be reduced/ eliminated. Comment on Outstanding achievement)</i><div style="margin-top:1.5mm">${nl(d.comments)}</div></td></tr>
-    </table>
-
-    <div style="display:flex; justify-content:space-between; margin-top:4mm; font-weight:700;">
-      <div>Appraisal on Role Attributes:</div><div style="width:55mm">${Math.round(roleW)}% &nbsp;&nbsp;&nbsp;weightage</div>
-    </div>
-    <div style="margin:2mm 0 3mm;">Rating: 5 = Outstanding, &nbsp;4= Very Good, &nbsp;3= Good, 2 = Fair, &nbsp;1= Poor</div>
-    <table>
-      <tr><th style="width:9%">S.No</th><th>Role Attribute</th><th class="c" style="width:14%">Rating</th></tr>
-      ${attrRows}
-      <tr class="avoid"><td></td><td class="c"><b>Total</b></td><td class="c">${fx(d.scores.attr)}</td></tr>
-    </table>
-
-    <div style="text-align:center; font-weight:700; margin:3mm 0 1.5mm;">My Learnings</div>
-    <table class="box">
-      <tr><td>Appraisee to write details of learnings from: Visit outside organization/ Customer Visit/ Training/ Reading of book/ journal/ internet information/ External Course</td></tr>
-      <tr><td style="height:14mm">${nl(d.learnings)}</td></tr>
-    </table>
-
-    <div style="font-weight:700; margin-top:5mm;">Training Need Identification</div>
-    <div style="margin:2mm 0 3mm;">Appraisee to identify the training needs to improve job performance in consultation with Appraiser</div>
-    <table>
-      <colgroup><col style="width:36%"><col style="width:32%"><col style="width:32%"></colgroup>
-      <tr><th>Training need</th><th>Expected benefit after training</th><th>How training need will be fulfilled ( Internal faculty/ Self-study/ Outside training</th></tr>
-      ${trainRows}
-    </table>
-
-    <div class="avoid" style="margin-top:4mm;">
-      <div><b>OVERALL PERFORMANCE RATING</b>: (Tick <b>one</b> applicable word)</div>
-      <div style="display:flex; margin-top:3mm;"><div style="width:62mm">${box('Outstanding')}</div><div style="width:62mm">${box('Exceeds Expectations')}</div><div>${box('Meets Expectations')}</div></div>
-      <div style="display:flex; margin-top:3mm;"><div style="width:62mm">${box('Needs Improvement')}</div><div>${box('Unacceptable')}</div></div>
-      <div class="sig">Sign. Appraiser……………………………Sign. HOD…………………………</div>
-    </div>
+      </div>`).join('') : '<div class="empty">No role attributes — Targets carry the full 100%.</div>'}
+    <div style="margin-top:10px;"><button class="small" onclick="addAttribute()">+ Add Role Attribute</button></div>
   </div>`;
 }
 
-async function generatePDF(d){
-  setStatus('Preparing PDF…', null);
+/* ---------- STEP 2 page (and read-only DONE page) ---------- */
+function ratingHtml(ro){
+  const ta = (id, ph) => ro ? `<div class="ro">${esc(state.texts[id]) || '—'}</div>`
+                            : `<textarea placeholder="${ph}" onchange="setText('${id}',this.value)">${esc(state.texts[id])}</textarea>`;
+  return `
+  <div class="score-bar" id="scoreBar"></div>
+  <div class="section">
+    <div class="section-head"><h2>Targets (KRA) &amp; Tasks</h2><span class="weight-badge">${fmt(kraTotal())}% · ${state.kras.length} target(s)</span></div>
+    ${state.kras.length ? '' : '<div class="empty">No targets were found for this quarter.</div>'}
+    ${state.kras.map((k, i) => `
+      <div class="kra-block">
+        <div><b>Target ${i+1}: ${esc(k.name)}</b> <span class="goal-tag">· ${fmt(k.weightage)}%</span></div>
+        ${k.description ? `<div style="font-size:12px;color:var(--muted);margin-top:3px;">${esc(k.description)}</div>` : ''}
+        ${k.goals.map((g, j) => `
+          <div class="goal-row">
+            <div class="rate-grid">
+              <div><label>Task ${i+1}.${j+1} · ${fmt(g.weightage)}%</label><div class="ro">${esc(g.name)}</div></div>
+              <div><label>Achievement</label>${ro ? `<div class="ro">${esc(g.achievement) || '—'}</div>`
+                 : `<textarea placeholder="What was achieved" onchange="setGoal('${k.id}','${g.id}','achievement',this.value)">${esc(g.achievement)}</textarea>`}</div>
+              <div><label>Self Rating ${ro?'':'<span class="req">*</span>'}</label>${ro ? `<div class="ro">${esc(g.selfRating) || '—'}</div>` : ratingSelect(g.selfRating, `setGoal('${k.id}','${g.id}','selfRating',this.value)`)}</div>
+              <div><label>Appraiser Rating</label><div class="ro">${esc(g.apprRating) || '—'}</div></div>
+            </div>
+          </div>`).join('')}
+      </div>`).join('')}
+  </div>
+  ${state.attributes.length ? `
+  <div class="section">
+    <div class="section-head"><h2>Role Attributes</h2><span class="weight-badge">${fmt(roleTotal())}%</span></div>
+    <div class="note">Rating: 5 = Outstanding, 4 = Very Good, 3 = Good, 2 = Fair, 1 = Poor</div>
+    ${state.attributes.map((a, i) => `
+      <div class="attr-row" style="grid-template-columns:3fr 1fr 1.3fr;">
+        <div><label>Attribute ${i+1}</label><div class="ro">${esc(a.name)}</div></div>
+        <div><label>Weightage</label><div class="ro">${fmt(a.weightage)}%</div></div>
+        <div><label>Rating ${ro?'':'<span class="req">*</span>'}</label>${ro ? `<div class="ro">${esc(a.rating) || '—'}</div>` : ratingSelect(a.rating, `setAttr('${a.id}','rating',this.value)`)}</div>
+      </div>`).join('')}
+  </div>` : ''}
+  <div class="section two-col">
+    <div><label>Facilitating Factors</label>${ta('facFactors','Factors that helped achieve the targets (mention target number)')}</div>
+    <div><label>Constraining Factors</label>${ta('conFactors','Factors that were constraints (mention target number)')}</div>
+    <div><label>Outstanding Achievement / Significant Contribution</label>${ta('outAchieve','Quantified benefit to company')}</div>
+    <div><label>Comments of Appraiser</label>${ta('apprComments','Comments')}</div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>My Learnings</h2></div>
+    ${ta('myLearnings','Visit outside organization / Customer Visit / Training / Reading / External Course')}
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>Training Need Identification</h2>${ro ? '' : '<button class="small" onclick="addTrainingRow()">+ Add Row</button>'}</div>
+    <table class="train-table">
+      <thead><tr><th>Training Need</th><th>Expected Benefit</th><th>How Fulfilled</th>${ro?'':'<th style="width:50px"></th>'}</tr></thead>
+      <tbody>${state.training.length ? state.training.map(t => ro || t.recId ? `
+        <tr><td>${esc(t.need)}</td><td>${esc(t.benefit)}</td><td>${esc(t.fulfilled)}</td>${ro?'':'<td></td>'}</tr>` : `
+        <tr><td><input value="${esc(t.need)}" onchange="setTrain('${t.id}','need',this.value)"></td>
+            <td><input value="${esc(t.benefit)}" onchange="setTrain('${t.id}','benefit',this.value)"></td>
+            <td><input value="${esc(t.fulfilled)}" placeholder="Internal / Self-study / Outside" onchange="setTrain('${t.id}','fulfilled',this.value)"></td>
+            <td><button class="small danger" onclick="removeTrainingRow('${t.id}')">✕</button></td></tr>`).join('')
+        : `<tr><td colspan="4" class="empty">${ro ? 'None.' : 'No training needs added yet.'}</td></tr>`}</tbody>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>Overall Performance Rating</h2></div>
+    <div class="overall-options" id="overallOptions"></div>
+  </div>`;
+}
+function renderScores(){
+  const el = document.getElementById('scoreBar'); if(!el) return;
+  const s = computeScores();
+  const tasks = state.kras.reduce((n,k) => n + k.goals.length, 0), rated = state.kras.reduce((n,k) => n + k.goals.filter(g => g.selfRating).length, 0);
+  el.innerHTML = `
+    <div class="score-tile"><div class="k">Targets (KRA)</div><div class="v">${fmt(s.kra)} / ${fmt(kraTotal())}</div><div class="s">${rated} of ${tasks} task(s) rated</div></div>
+    <div class="score-tile"><div class="k">Role Attributes</div><div class="v">${fmt(s.role)} / ${fmt(roleTotal())}</div><div class="s">${state.attributes.length} attribute(s)</div></div>
+    <div class="score-tile final"><div class="k">Self Score (auto)</div><div class="v">${fmt(s.total)} / 100</div><div class="s">≈ ${suggestedOverall(s.total)}</div></div>`;
+}
+function renderOverall(){
+  const el = document.getElementById('overallOptions'); if(!el) return;
+  const ro = state.phase === 'done';
+  el.innerHTML = OVERALL_LABELS.map(l => `<div class="overall-opt ${state.overallRating===l?'selected':''}" ${ro?'':`onclick="setOverall('${l}')"`}>${l}</div>`).join('');
+}
+
+/* ======================= STATUS / DRAFT ======================= */
+function setStatus(msg, ok){ const s = document.getElementById('statusText'); s.textContent = msg; s.classList.remove('ok','bad'); if(ok===true) s.classList.add('ok'); if(ok===false) s.classList.add('bad'); }
+function draftKey(){ return `mega_pa::${state.me ? state.me.email : ''}::${state.quarter}::${state.year}::${state.phase}`; }
+function markUnsaved(){ if(state.phase !== 'targets' && state.phase !== 'rating') return; saveDraft(); setStatus('Draft kept in this browser — remember to submit.', null); }
+function saveDraft(){
+  if(!state.me || (state.phase !== 'targets' && state.phase !== 'rating')) return;
+  let d;
+  if(state.phase === 'targets') d = { kras:state.kras, attributes:state.attributes, appraiser:val('appraiserName') };
+  else d = {
+    goals:Object.fromEntries(state.kras.flatMap(k => k.goals).map(g => [g.recId, { a:g.achievement, r:g.selfRating }])),
+    attrs:Object.fromEntries(state.attributes.map(a => [a.recId, a.rating])),
+    training:state.training, texts:state.texts, overall:state.overallRating, appraiser:val('appraiserName')
+  };
+  try{ localStorage.setItem(draftKey(), JSON.stringify(d)); }catch(e){}
+}
+function restoreDraft(){
+  let d = null; try{ d = JSON.parse(localStorage.getItem(draftKey()) || 'null'); }catch(e){}
+  if(!d) return false;
+  if(state.phase === 'targets'){
+    if(!Array.isArray(d.kras) || !d.kras.length) return false;
+    state.kras = d.kras; state.attributes = d.attributes || [];
+  } else {
+    state.kras.forEach(k => k.goals.forEach(g => { const x = d.goals && d.goals[g.recId]; if(x){ if(x.a && !g.achievement) g.achievement = x.a; if(x.r && !g.selfRating) g.selfRating = x.r; } }));
+    state.attributes.forEach(a => { const r = d.attrs && d.attrs[a.recId]; if(r && !a.rating) a.rating = r; });
+    if(Array.isArray(d.training)){ const saved = state.training.filter(t => t.recId); state.training = saved.concat(d.training.filter(t => !t.recId)); }
+    if(d.texts) Object.keys(state.texts).forEach(k => { if(!state.texts[k] && d.texts[k]) state.texts[k] = d.texts[k]; });
+    if(d.overall && !state.overallRating) state.overallRating = d.overall;
+  }
+  const allIds = [...state.kras.flatMap(k => [k.id, ...k.goals.map(g => g.id)]), ...state.attributes.map(a => a.id), ...state.training.map(t => t.id)];
+  seq = Math.max(seq, allIds.reduce((m, id) => Math.max(m, parseInt(String(id).slice(1)) || 0), 0) + 1);
+  if(d.appraiser && !val('appraiserName')) document.getElementById('appraiserName').value = d.appraiser;
+  return true;
+}
+function clearDraft(){ try{ localStorage.removeItem(draftKey()); }catch(e){} }
+function val(id){ const el = document.getElementById(id); return el ? el.value : ''; }
+
+/* ======================= SUBMIT ======================= */
+function mainAction(){ if(state.phase === 'targets') submitTargets(); else if(state.phase === 'rating') submitRating(); }
+function lock(on){ state.busy = on; document.getElementById('mainBtn').disabled = on; }
+
+function validateTargets(){
+  if(!state.kras.length) return 'Add at least one Target (KRA).';
+  for(let i = 0; i < state.kras.length; i++){
+    const k = state.kras[i];
+    if(!k.name.trim()) return `Target ${i+1}: enter the target name.`;
+    if(!k.goals.length) return `Target ${i+1}: add at least one task.`;
+    for(let j = 0; j < k.goals.length; j++) if(!k.goals[j].name.trim()) return `Task ${i+1}.${j+1}: describe the task (or remove it).`;
+  }
+  for(let i = 0; i < state.attributes.length; i++) if(!state.attributes[i].name.trim()) return `Role Attribute ${i+1}: enter the name (or remove it).`;
+  return '';
+}
+/* STEP 1 → KRA, Goal, Competency records + Review (Status Draft).
+   Records already created (recId set) are skipped on a retry. */
+async function submitTargets(){
+  if(state.busy) return;
+  applyWeights();
+  const problem = validateTargets(); if(problem){ setStatus('❌ ' + problem, false); return; }
+  const me = state.me, q = state.quarter, y = state.year;
+  lock(true);
   try{
-    await Promise.all([
-      document.fonts.load('400 12px "Noto Sans"'),
-      document.fonts.load('700 12px "Noto Sans"'),
-      document.fonts.load('italic 400 12px "Noto Sans"'),
-      document.fonts.load('400 12px "Noto Sans Devanagari"', 'उद्दिष्ट प्राप्ति कंपनीला'),
-      document.fonts.load('700 12px "Noto Sans Devanagari"', 'उद्दिष्ट प्राप्ति')
-    ]);
-    await document.fonts.ready;
-
-    const el = document.createElement('div');
-    el.innerHTML = buildAppraisalHTML(d);
-    const fileName = `Appraisal_${(d.employee||'Employee').replace(/\s+/g,'_')}_${d.quarter}_${d.year}.pdf`;
-
-    await html2pdf().set({
-      margin: [10, 10, 14, 10],
-      filename: fileName,
-      image: { type:'jpeg', quality:0.98 },
-      html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff' },
-      jsPDF: { unit:'mm', format:'a4', orientation:'portrait' },
-      pagebreak: { mode:['css','legacy'], before:'.pb', avoid:['tr','.avoid'] }
-    }).from(el).toPdf().get('pdf').then(function(pdf){
-      const total = pdf.internal.getNumberOfPages();
-      for(let i=1;i<=total;i++){
-        pdf.setPage(i); pdf.setFontSize(9); pdf.setTextColor(0);
-        pdf.text(String(i), 200, 289, { align:'right' });
+    setStatus('Checking…', null);
+    const already = await getAllSafe(CONFIG.REPORTS.review, `(Employee_Lookup == ${me.ID} && Quarter == "${q}" && Year_field == "${y}")`);
+    if(already.length && !state.kras.some(k => k.recId)){ setStatus('Targets for ' + q + ' ' + y + ' are already saved — reloading.', null); lock(false); return loadPeriod(); }
+    const total = state.kras.reduce((n,k) => n + 1 + k.goals.length, 0) + state.attributes.length + 1;
+    let step = 0; const tick = w => setStatus(`Saving ${w}… (${++step}/${total}) — do not close this page.`, null);
+    for(const k of state.kras){
+      tick('targets');
+      if(!k.recId){ const r = await addRecord(CONFIG.FORMS.kra, { KRA_Name:k.name.trim(), Description:k.description || '', Employee_Name:me.name, Quarter:q, Year_field1:y, Weightage:k.weightage }); k.recId = String(r.ID); saveDraft(); }
+      for(const g of k.goals){
+        tick('tasks');
+        if(!g.recId){ const r = await addRecord(CONFIG.FORMS.goal, { Goal_Name:g.name.trim(), Description:g.name.trim(), KRA:k.recId, Weightage:g.weightage, Data_Source:'Manual' }); g.recId = String(r.ID); saveDraft(); }
       }
-    }).save();
-
-    setStatus('✅ PDF downloaded.', true);
-  } catch(err){
-    console.error('PDF ERROR', err);
-    setStatus('PDF failed — check console.', false);
+    }
+    for(const a of state.attributes){
+      tick('role attributes');
+      if(!a.recId){ const r = await addRecord(CONFIG.FORMS.competency, { Attribute_Name:a.name.trim(), Weightage:a.weightage, Employee_Name1:me.name, Quarter:q, Year_field1:y }); a.recId = String(r.ID); saveDraft(); }
+    }
+    tick('review');
+    if(!already.length){
+      await addRecord(CONFIG.FORMS.review, { Employee_Lookup:me.ID, Status:CONFIG.STATUS.targetsSet, Appraiser_Name:val('appraiserName'),
+        Department:me.department, Quarter:q, Year_field:y });
+    }
+    clearDraft();
+    lock(false);
+    await loadPeriod();
+    setStatus('✅ Targets saved. Come back to this page for Step 2 — Self Rating.', true);
+  }catch(err){
+    console.error('TARGETS ERROR', err); lock(false);
+    setStatus('❌ Save failed: ' + errText(err) + ' — click Submit Targets again (saved items are not duplicated).', false);
+  }
+}
+function validateRating(){
+  for(let i = 0; i < state.kras.length; i++) for(let j = 0; j < state.kras[i].goals.length; j++)
+    if(!state.kras[i].goals[j].selfRating) return `Task ${i+1}.${j+1}: select your self rating.`;
+  for(let i = 0; i < state.attributes.length; i++) if(!state.attributes[i].rating) return `Role Attribute ${i+1}: select a rating.`;
+  if(!state.kras.length) return 'No targets found for this quarter.';
+  return '';
+}
+/* STEP 2 → update Goal + Competency ratings, add Training_Need,
+   then Review Status "Submitted for Approval" (done last). */
+async function submitRating(){
+  if(state.busy) return;
+  const problem = validateRating(); if(problem){ setStatus('❌ ' + problem, false); return; }
+  const me = state.me, q = state.quarter, y = state.year, s = computeScores();
+  lock(true);
+  try{
+    const goals = state.kras.flatMap(k => k.goals), newTrain = state.training.filter(t => !t.recId && t.need.trim());
+    const total = goals.length + state.attributes.length + newTrain.length + 1;
+    let step = 0; const tick = w => setStatus(`Saving ${w}… (${++step}/${total}) — do not close this page.`, null);
+    for(const g of goals){ tick('self ratings'); await updateRecord(CONFIG.REPORTS.goal, g.recId, { Achievement:g.achievement || '', Self_Rating:String(g.selfRating) }); }
+    for(const a of state.attributes){ tick('role attributes'); await updateRecord(CONFIG.REPORTS.competency, a.recId, { Rating:String(a.rating) }); }
+    for(const t of newTrain){
+      tick('training needs');
+      const r = await addRecord(CONFIG.FORMS.training, { Training_Need:t.need.trim(), Expected_Benefit:t.benefit || '', How_Fulfilled:t.fulfilled || '', Employee_Name:me.name, Quarter1:q, Year_field:y });
+      t.recId = String(r.ID); saveDraft();
+    }
+    tick('review');
+    const data = { Status:CONFIG.STATUS.selfRated, Appraiser_Name:val('appraiserName'),
+      Facilitating_Factors1:state.texts.facFactors, Constraining_Factors:state.texts.conFactors, Outstanding_Achievement:state.texts.outAchieve,
+      Appraiser_Comments:state.texts.apprComments, My_Learnings:state.texts.myLearnings, Overall_Rating:state.overallRating || '',
+      KRA_Score:s.kra, Competency_Score:s.role, Final_Score:s.total };
+    if(state.review) await updateRecord(CONFIG.REPORTS.review, state.review.ID, data);
+    else await addRecord(CONFIG.FORMS.review, Object.assign({ Employee_Lookup:me.ID, Department:me.department, Quarter:q, Year_field:y }, data));
+    clearDraft();
+    lock(false);
+    await loadPeriod();
+    setStatus('✅ Self rating submitted. Download your PDF anytime.', true);
+  }catch(err){
+    console.error('RATING ERROR', err); lock(false);
+    setStatus('❌ Save failed: ' + errText(err) + ' — your entries are kept, click Submit Self Rating again.', false);
   }
 }
 
-/* ---- Footer button: appears after a successful Save / Submit ---- */
-function downloadSavedPDF(){
-  if(!lastSavedPDF){ setStatus('Save the appraisal first, then download the PDF.', false); return; }
-  generatePDF(lastSavedPDF);
+/* ======================= PDF ======================= */
+function downloadPdf(){
+  if(state.phase === 'loading'){ setStatus('Please wait — still loading.', null); return; }
+  applyWeights();
+  const sh = { kra:kraTotal(), role:roleTotal() };
+  downloadAppraisalPdf({
+    employeeName:state.me.name, department:state.me.department, appraiser:val('appraiserName'), year:state.year, quarter:state.quarter,
+    kraSectionWeight:Math.round(sh.kra*100)/100 || 100, roleSectionWeight:Math.round(sh.role*100)/100, ratingMap:CONFIG.RATING_PCT,
+    kras:state.kras.map(k => ({ name:k.name, description:k.description, weightage:k.weightage,
+      goals:k.goals.filter(g => g.name || g.achievement).map(g => ({ name:g.name, achievement:g.achievement, weightage:g.weightage, selfRating:g.selfRating, apprRating:g.apprRating })) })),
+    attributes:state.attributes.map(a => ({ name:a.name, weightage:a.weightage, rating:a.rating })),
+    facilitating:state.texts.facFactors, constraining:state.texts.conFactors, outstanding:state.texts.outAchieve,
+    comments:state.texts.apprComments, learnings:state.texts.myLearnings,
+    training:state.training.map(t => ({ need:t.need, benefit:t.benefit, fulfilled:t.fulfilled })),
+    overallRating:state.overallRating || ''
+  }, setStatus);
 }
 
-/* ---- Approvals detail view (saved records) ---- */
-function downloadApprovalPDF(){
-  const a = state.activeApproval; if(!a) return;
-  const r = a.review;
-  const empId = r.Employee_Lookup ? (r.Employee_Lookup.ID || r.Employee_Lookup) : '';
-  const empName = empNameFromId(empId) || (r.Employee_Lookup && r.Employee_Lookup.zc_display_value) || '';
-  generatePDF({
-    employee: empName,
-    appraiser: r.Appraiser_Name || '',
-    department: r.Department || '',
-    quarter: r.Quarter || '',
-    year: r.Year_field || '',
-    status: r.Status || '',
-    overall: r.Overall_Rating || '',
-    kras: a.kras.map(p => ({
-      name: p.kra.KRA_Name, description: p.kra.Description, weightage: p.kra.Weightage,
-      goals: p.goals.map(g => ({
-        name: g.Goal_Name, achievement: g.Achievement, weightage: g.Weightage,
-        selfRating: g.Self_Rating, apprRating: g.Appraiser_Rating
-      }))
-    })),
-    attributes: a.competencies.map(c => ({ name: c.Attribute_Name, weightage: c.Weightage, rating: c.Rating })),
-    facilitating: r.Facilitating_Factors1 || '',
-    constraining: r.Constraining_Factors || '',
-    outstanding: r.Outstanding_Achievement || '',
-    comments: r.Appraiser_Comments || '',
-    learnings: r.My_Learnings || '',
-    training: [],
-    scores: { kra: r.KRA_Score, attr: r.Competency_Score, final: r.Final_Score }
-  });
-}
+/* ======================= UTIL ======================= */
+function esc(s){ return (s === null || s === undefined ? '' : String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmt(n){ const x = Number(n) || 0; return (Math.round(x * 100) / 100).toString(); }
 
-/* ============================================================
-   UTIL
-   ============================================================ */
-function escapeHtml(s){ return (s||'').toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function escapeAttr(s){ return escapeHtml(s); }
-
-/* ============================================================
-   INIT
-   ============================================================ */
-renderQuarters();
-renderRatingMap();
-renderAll();
-renderTraining();
-renderOverall();
-
-if(window.ZOHO && ZOHO.CREATOR){
-  ZOHO.CREATOR.init().then(async function(){
-    setStatus('Connected to Creator — loading employees…', true);
-    await fetchEmployees();
-    populateEmployeeDropdowns();
-    state.currentUserEmail = await getCurrentUser();
-    await fetchPendingApprovals();
-    setStatus('Ready to save.', true);
-  }).catch(function(err){ console.error('Widget SDK init failed', err); setStatus('Widget not initialized — open this inside Creator, not standalone.', false); });
-} else {
-  setStatus('Zoho Creator SDK not detected — running standalone (saves will fail).', false);
-}
+/* ======================= INIT ======================= */
+window.addEventListener('beforeunload', () => saveDraft());
+(async function init(){
+  if(!(window.ZOHO && ZOHO.CREATOR)){ loginMsg('Zoho Creator SDK not found — open this page as a Creator widget.', false); return; }
+  try{
+    await ZOHO.CREATOR.init();
+    state.creatorUser = await getCreatorUser();
+    await loadEmployees();
+    state.sdkReady = true;
+    document.getElementById('loginBtn').disabled = false;
+    loginMsg('', null);
+    let saved = ''; try{ saved = sessionStorage.getItem('mega_pa_session') || ''; }catch(e){}
+    const input = document.getElementById('loginEmail');
+    input.value = saved || state.creatorUser || '';
+    if(saved && state.employees.some(e => e.email === saved) && (!state.creatorUser || state.creatorUser === saved)) doLogin();
+    else input.focus();
+  }catch(err){
+    console.error('INIT ERROR', err);
+    loginMsg('Could not load the employee list: ' + errText(err) + '. Check CONFIG.EMPLOYEE_REPORTS and your permission on that report.', false);
+  }
+})();
 </script>
 </body>
 </html>
